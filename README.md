@@ -6,4 +6,4 @@ A scripting language to dynamically build FormIt forms without the need to hand 
 Basic PHP syntax is required which makes for simple commands build complex forms.
 Forms can be output in raw FormIT syntax or it can simply be dynamically run in conjunction with FormIT.
 
-Stay Tuned. Not at a stage of beta as yet.
+Stay Tuned. Not at a stage of beta as yet...
