@@ -28,7 +28,7 @@ class FormItBuilderCore{
 		}		
 	}
 	public static function throwError($errorString){
-		throw new Exception($errorString);
+		throw new Exception($errorString."\r\n");
 	}
 	public static function verifyFormElement(FormItBuilder_element $el){
 		if(is_a($el, 'FormItBuilder_element')===false){

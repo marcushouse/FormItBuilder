@@ -55,8 +55,8 @@ class FormRule extends FormItBuilderCore{
 			case FormRuleType::required:
 				if($validationMessage===NULL){
 					 $this->_validationMessage = $element->getLabel().' is required';
-					 $element->isRequired(true);
 				}
+				$element->isRequired(true);
 				break;
 				
 			//value driven number type validators

@@ -65,7 +65,41 @@ abstract class FormItBuilder_element extends FormItBuilderCore{
 		}
 	}
 }
-
+class FormItBuilder_elementSelect extends FormItBuilder_element{
+	private $_values;
+	private $_defaultVal;
+	/**
+	 * FormIt constructor
+	 *
+	 * @param string $id Id of the element
+	 * @param string $label Label of the select element
+	 * @param array $values Array of title/value arrays in order of display.
+	 */
+	function __construct(string $id, string $label, array $values, string $defaultValue) {
+		parent::__construct($id,$label);
+		$this->_values = $values;
+	}
+	
+	public function outputHTML(){
+		if(isset($_POST[$this->_id])===true){
+			$selectedVal=$_POST[$this->_id];
+		}else{
+			$selectedVal=$this->_defaultVal;
+		}
+		$b_selectUsed=false;
+		$s_ret='<select id="'.htmlentities($this->_id).'" name="'.htmlentities($this->_id).'">'."\r\n";
+		foreach($this->_values as $key=>$value){
+			$s_ret.='<option value="'.htmlentities($key).'"';
+			if($b_selectUsed===false && $selectedVal==$key){
+				$s_ret.=' selected="selected"';
+				$b_selectUsed=true;
+			}
+			$s_ret.='>'.htmlentities($value).'</option>'."\r\n";
+		}
+		$s_ret.='</select>';
+		return $s_ret;
+	}
+}
 class FormItBuilder_elementButton extends FormItBuilder_element{
 	//TODO - Add getters and setters
 	protected $_type;

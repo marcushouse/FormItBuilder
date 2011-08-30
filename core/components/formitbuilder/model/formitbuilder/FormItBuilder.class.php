@@ -94,7 +94,7 @@ class FormItBuilder extends FormItBuilderCore{
 				//do nothing
 			}else{
 				if($o_el->showInEmail()===true){
-					$s_ret.='<tr valign="top"><td><b>'.htmlentities($o_el->getLabel()).':</b></td><td>[[+'.htmlentities($elID).']]</td></tr>';
+					$s_ret.='<tr valign="top"><td><b>'.htmlentities($o_el->getLabel()).':</b></td><td>[[+'.htmlentities($o_el->getId()).']]</td></tr>';
 				}
 			}
 		}
@@ -145,76 +145,7 @@ class FormItBuilder extends FormItBuilderCore{
 	public function output(){
 		$s_submitVar = 'submitVar_'.$this->_id;
 		$nl="\r\n";
-		$s_form='<form action="[[~'.$this->modx->resource->get('id').']]" method="'.htmlentities($this->_method).'" class="form" id="'.htmlentities($this->_id).'"><div>'.$nl
-		.$nl.'<input type="hidden" name="'.$s_submitVar.'" value="1" />'
-		.$nl.'<input type="hidden" name="fke'.date('Y').'Sp'.date('m').'Blk:blank" value="" /><!-- additional crude spam block. If this field ends up with data it will fail to submit -->'
-		.$nl;
 
-		//process and add form element rules
-		foreach($this->_formElements as $o_el){
-			if(is_a($o_el,'FormItBuilder_htmlBlock')){
-				$s_form.=$o_el->outputHTML();
-			}else{
-				
-				/*			
-				$a_fieldProps[$o_el->getId()]=array();
-				$a_fieldProps_jqValidate[$o_el->getId()]=array();
-				
-				//add required first so that required warnings are displayed before any other.
-				if($o_el->isRequired()===true){
-					$a_fieldProps[$o_el->getId()][] = 'required';
-					$a_fieldProps_jqValidate[$o_el->getId()][] = 'required:true';
-				}
-				//textfield validators
-				if(is_a($o_el,'FormItBuilder_elementText')){
-					if($o_el->isNumeric()===true){
-						$a_fieldProps[$o_el->getId()][] = 'isNumber';
-						$a_fieldProps_jqValidate[$o_el->getId()][] = 'digits:true';
-					}
-					if($o_el->isEmail()===true){
-						$a_fieldProps[$o_el->getId()][] = 'email';
-						$a_fieldProps_jqValidate[$o_el->getId()][] = 'email:true';
-					}
-					
-					$minLen=$o_el->getMinLength();
-					$maxLen=$o_el->getMaxLength();
-					if($minLen!==NULL){
-						$a_fieldProps[$o_el->getId()][] = 'minLength=`'.$minLen.'`';
-						$a_fieldProps_jqValidate[$o_el->getId()][] = 'minlength:'.$minLen;
-					}
-					if($maxLen!==NULL){
-						$a_fieldProps[$o_el->getId()][] = 'maxLength=`'.$maxLen.'`';
-						$a_fieldProps_jqValidate[$o_el->getId()][] = 'maxlength:'.$maxLen;
-					}
-					
-					$minVal=$o_el->getMinValue();
-					$maxVal=$o_el->getMaxValue();
-					if($minVal!==NULL){
-						$a_fieldProps[$o_el->getId()][] = 'minValue=`'.$minVal.'`';
-						$a_fieldProps_jqValidate[$o_el->getId()][] = 'min:'.$minVal;
-					}
-					if($maxVal!==NULL){
-						$a_fieldProps[$o_el->getId()][] = 'maxValue=`'.$maxVal.'`';
-						$a_fieldProps_jqValidate[$o_el->getId()][] = 'max:'.$maxVal;
-					}
-				}
-				 */
-
-				$s_form.='<div class="formSegWrap formSegWrap_'.htmlentities($o_el->getId()).'">';
-					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <label for="'.htmlentities($o_el->getId()).'">'.htmlentities($o_el->getLabel()).'</label>';
-					}
-					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
-					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <label class="nonjqValidate error" for="'.htmlentities($o_el->getId()).'">[[+fi.error.'.htmlentities($o_el->getId()).']]</label>';
-					}
-					$s_form.=$nl.'  </div>';
-				$s_form.=$nl.'</div>'.$nl;
-			}
-		}
-		$s_form.=$nl.'</div></form>';
-		
-				
 		//process and add form rules
 		$a_fieldProps=array();
 		$a_fieldProps_jqValidate=array();
@@ -299,7 +230,31 @@ class FormItBuilder extends FormItBuilderCore{
 					break;
 
 			}
-		}		
+		}
+		
+		//build html
+		$s_form='<form action="[[~[[*id]]]]" method="'.htmlentities($this->_method).'" class="form" id="'.htmlentities($this->_id).'"><div>'.$nl
+		.$nl.'<div class="process_errors_wrap"><div class="process_errors">[[!+fi.error_message:notempty=`[[!+fi.error_message]]`]]</div></div>'
+		.$nl.'<input type="hidden" name="'.$s_submitVar.'" value="1" />'
+		.$nl.'<input type="hidden" name="fke'.date('Y').'Sp'.date('m').'Blk:blank" value="" /><!-- additional crude spam block. If this field ends up with data it will fail to submit -->'
+		.$nl;
+		foreach($this->_formElements as $o_el){
+			if(is_a($o_el,'FormItBuilder_htmlBlock')){
+				$s_form.=$o_el->outputHTML();
+			}else{
+				$s_form.='<div class="formSegWrap formSegWrap_'.htmlentities($o_el->getId()).'">';
+					if($o_el->showLabel()===true){
+						$s_form.=$nl.'  <label for="'.htmlentities($o_el->getId()).'">'.htmlentities($o_el->getLabel()).'</label>';
+					}
+					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
+					if($o_el->showLabel()===true){
+						$s_form.=$nl.'  <label class="nonjqValidate error" for="'.htmlentities($o_el->getId()).'">[[+fi.error.'.htmlentities($o_el->getId()).']]</label>';
+					}
+					$s_form.=$nl.'  </div>';
+				$s_form.=$nl.'</div>'.$nl;
+			}
+		}
+		$s_form.=$nl.'</div></form>';
 		
 		//add all formit validation rules together in one array for easy implode
 		$a_formItCmds=array();
@@ -307,9 +262,15 @@ class FormItBuilder extends FormItBuilderCore{
 		foreach($a_fieldProps as $fieldID=>$a_fieldProp){
 			if(count($a_fieldProp)>0){
 				$a_formItCmds[]=$fieldID.':'.implode(':',$a_fieldProp);
-				//$a_formItErrorMessage[]=something';
 			}
 		}
+		//add formIT error messages
+		foreach($a_fieldProps_errstringFormIt as $fieldID=>$msgArray){
+			foreach($msgArray as $msg){
+				$a_formItErrorMessage[]='&'.$fieldID.'.'.$msg;
+			}
+		}
+		
 		for($i=0; $i<count($a_formProps); $i++){
 			$a_formItCmds[]=$a_formProps[$i];
 			if(empty($a_formPropsFormItErrorStrings[$i])===false){
@@ -326,7 +287,7 @@ class FormItBuilder extends FormItBuilderCore{
 		.$nl.'&redirectTo=`'.$this->_redirectDocument.'`'
 		.$nl.'&submitVar=`'.$s_submitVar.'`'
 		.$nl.implode($nl,$a_formItErrorMessage)
-		.$nl.'&validate=`'.$nl.' '.implode(','.$nl.' ',$a_formItCmds).$nl.'`]]'.$nl;
+		.$nl.'&validate=`'.$nl.' ,'.implode(','.$nl.' ',$a_formItCmds).','.$nl.'`]]'.$nl;
 		
 		if($this->_jqueryValidation===true){
 			$s_js='
