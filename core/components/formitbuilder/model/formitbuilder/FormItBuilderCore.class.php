@@ -1,5 +1,4 @@
 <?php
-
 require_once 'FormElement.class.php';
 require_once 'FormItBuilder.class.php';
 require_once 'FormRule.class.php';
@@ -25,6 +24,13 @@ class FormItBuilderCore{
 			return $v;
 		}else{
 			self::throwError('Value "'.$v.'" must be an type (int) - (Pass only integer values not string numbers)');
+		}		
+	}
+	public static function forceArray($v){
+		if(is_array($v)===true){
+			return $v;
+		}else{
+			self::throwError('Value "'.$v.'" must be type (array)');
 		}		
 	}
 	public static function throwError($errorString){

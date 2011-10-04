@@ -11,12 +11,14 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_method;
 	private $_id;
 	private $_redirectDocument;
+	private $_hooks;
 	private $_jqueryValidation;
 	private $_formElements;
 	private $_postHookName;
 	private $_headHtml;
 	private $_emailFromAddress;
 	private $_emailSubject;
+	private $_emailToAddress;
 	private $_emailFontSize;
 	private $_emailFontFamily;
 	private $_emailHeadHtml;
@@ -38,6 +40,12 @@ class FormItBuilder extends FormItBuilderCore{
 		
 		$this->_emailFontSize='13px';
 		$this->_emailFontFamily='Helvetica,Arial,sans-serif';
+		
+		//test that required snippets are available
+		$snippet_formIt = $this->modx->getObject('modSnippet',array('name'=>'FormIt'));
+		if($snippet_formIt===NULL){
+			FormItBuilder::throwError('FormIt snippet does not appear to be installed. Please install FormIt package.');
+		}
 	}
 	
 	public function addRule(FormRule $formRule){
@@ -62,17 +70,21 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getRedirectDocument() { return $this->_redirectDocument; } 
 	public function getJqueryValidation() { return $this->_jqueryValidation; } 
 	public function getPostHookName() { return $this->_postHookName; }
-	public function getEmailAddress() { return $this->_emailFromAddress; }
+	public function getEmailFromAddress() { return $this->_emailFromAddress; }
+	public function getEmailToAddress() { return $this->_emailToAddress; }
 	public function getEmailSubject() { return $this->_emailSubject; }
 	public function getEmailHeadHtml() { return $this->_emailHeadHtml; }
+	public function getHooks() { return $this->_hooks; }
 	
 	public function setMethod($v) { $this->_method = $v; } 
 	public function setRedirectDocument($v) { $this->_redirectDocument = $v; } 
 	public function setJqueryValidation($v) { $this->_jqueryValidation = self::forceBool($v); }
 	public function setPostHookName($v) { $this->_postHookName = $v; }
 	public function setEmailFromAddress($v) { $this->_emailFromAddress = $v; }
+	public function setEmailToAddress($v) { $this->_emailToAddress = $v; }
 	public function setEmailSubject($v) { $this->_emailSubject = $v; }
 	public function setEmailHeadHtml($v) { $this->_emailHeadHtml = $v; }
+	public function setHooks($v){$this->_hooks = self::forceArray($v);}
         
 	public function addElement(FormItBuilder_element $o_formElement){
 		$this->_formElements[]=$o_formElement;
@@ -86,15 +98,23 @@ class FormItBuilder extends FormItBuilderCore{
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
 		
 		$s_ret='<div style="'.$s_style.'">'.$this->_emailHeadHtml
-		.'<table style="'.$s_style.'">';
+		.'<table cellpadding="4" cellspacing="0" style="'.$s_style.'">';
 		
-		$cnt=0;
+		$bgCol1="#FFFFFF";
+		$bgCol2="#e4edf9";
+		$rowCount=0;
 		foreach($this->_formElements as $o_el){
 			if(get_class($o_el)=='FormItBuilder_htmlBlock'){
 				//do nothing
 			}else{
 				if($o_el->showInEmail()===true){
-					$s_ret.='<tr valign="top"><td><b>'.htmlentities($o_el->getLabel()).':</b></td><td>[[+'.htmlentities($o_el->getId()).']]</td></tr>';
+					$bgCol=$bgCol1;
+					if($rowCount%2==0){
+						$bgCol=$bgCol2;
+					}
+					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlentities($o_el->getLabel()).':</b></td><td>[[+'.htmlentities($o_el->getId()).':nl2br]]</td></tr>';
+					$rowCount++;
+					
 				}
 			}
 		}
@@ -244,11 +264,15 @@ class FormItBuilder extends FormItBuilderCore{
 			}else{
 				$s_form.='<div class="formSegWrap formSegWrap_'.htmlentities($o_el->getId()).'">';
 					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <label for="'.htmlentities($o_el->getId()).'">'.htmlentities($o_el->getLabel()).'</label>';
+						$forId=$o_el->getId();
+						if(is_a($o_el,'FormItBuilder_elementRadioGroup')===true){
+							$forId=$o_el->getId().'_0';
+						}
+						$s_form.=$nl.'  <label class="mainElLabel" for="'.htmlentities($forId).'">'.htmlentities($o_el->getLabel()).'</label>';
 					}
 					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
 					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <label class="nonjqValidate error" for="'.htmlentities($o_el->getId()).'">[[+fi.error.'.htmlentities($o_el->getId()).']]</label>';
+						$s_form.=$nl.'  <div class="errorContainer"><label class="error" for="'.htmlentities($o_el->getId()).'">[[+fi.error.'.htmlentities($o_el->getId()).']]</label></div>';
 					}
 					$s_form.=$nl.'  </div>';
 				$s_form.=$nl.'</div>'.$nl;
@@ -278,9 +302,9 @@ class FormItBuilder extends FormItBuilderCore{
 			}
 		}
 		$s_formItCmd='[[!FormIt?'
-		.$nl.'&hooks=`'.$this->_postHookName.',spam,email,redirect`'
+		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?','.implode(',',$this->_hooks):'').'`'
 		.$nl.'&emailTpl=`FormItBuilderEmailTpl`'
-		.$nl.'&emailTo=`marcus@datawebnet.com.au`'
+		.(isset($this->_emailToAddress)?$nl.'&emailTo=`'.$this->_emailToAddress.'`':'')
 		.(isset($this->_emailFromAddress)?$nl.'&emailFrom=`'.$this->_emailFromAddress.'`':'')
 		.$nl.'&emailSubject=`'.$this->_emailSubject.'`'
 		.$nl.'&emailUseFieldForSubject=`1`'
@@ -295,8 +319,22 @@ class FormItBuilder extends FormItBuilderCore{
 // <![CDATA[
 $().ready(function() {
 
-$(".nonjqValidate").remove();
-$("#'.$this->_id.'").validate({ignore:":hidden",'.
+//Remove existing error label and create own dynamically.
+$(".errorContainer .error").remove();
+
+//Main validate call
+$("#'.$this->_id.'").validate({errorPlacement:function(error, element) {
+	var labelEl = element.parents(".formSegWrap").find(".errorContainer");
+	error.appendTo( labelEl );
+},success: function(element) {
+	element.addClass("valid");
+	var formSegWrapEl = element.parents(".formSegWrap");
+	formSegWrapEl.children(".mainElLabel").removeClass("mainLabelError");
+},highlight: function(el, errorClass, validClass) {
+	var element= $(el);
+	element.addClass(errorClass).removeClass(validClass);
+	element.parents(".formSegWrap").children(".mainElLabel").addClass("mainLabelError");
+},ignore:":hidden",'.
 					
 $this->jqueryValidateJSON(
 	$a_fieldProps_jqValidate,
@@ -313,88 +351,7 @@ $this->jqueryValidateJSON(
 		
 		//for debugging
 		//echo $s_formItCmd.$s_form; exit();
-		
 		return $s_formItCmd.$s_form.$s_js;
-		
-		return '[[!FormIt?
-	&hooks=`email,redirect`
-	&emailTpl=`sent_email_template`
-	&emailTo=`marcus@datawebnet.com.au`
-	&emailSubject=`Email Subject`
-	&emailUseFieldForSubject=`1`
-	&redirectTo=`11`
-	&submitVar=`contactform`
-	&validate=`
-		contact_name:required,
-        contact_company:required,
-        contact_address:required,
-        contact_city:required,
-        contact_state:required,
-        contact_postcode:required,
-        contact_country:required,
-		contact_email:email:required,
-        contact_phone:required`
-  ]]
-  
-  [[!+fi.error.error_message:notempty=`<p class="error">[[!+fi.error.error_message]]</p>`]]
-  
-  <h1>Product Enquiry / Quote</h1>
-  
-  <p><strong>Please submit only ONE form at a time.</strong><br /></p>
-            
-  <form action="[[~[[*id]]]]" method="post" id="product-enquiry-form">
-    
-      <input type="hidden" name="contactform" value="1" />
-	  
-	  <!-- additional crude spam block. If this field ends up with data it will fail to submit -->
-	  <input type="hidden" name="fkeSpBlk:blank" value="" />
-  
-      <p><label for="contact_name">Full Name * <span class="error">[[+fi.error.contact_name]]</span></label>
-      <input type="text" name="contact_name" id="contact_name" maxlength="60" value="[[+fi.contact_name]]" /></p>
-      
-      <p><label for="contact_company">Company * <span class="error">[[+fi.error.contact_company]]</span></label>
-      <input type="text" name="contact_company" id="contact_company" maxlength="60" value="[[+fi.contact_company]]" /></p>
-
-      <p><label for="contact_position">Position</label>
-      <input type="text" name="contact_position" id="contact_position" maxlength="60" value="[[+fi.contact_position]]" /></p>
-
-      <p><label for="contact_address">Postal Address *<span class="error">[[+fi.error.contact_address]]</span></label>
-      <input type="text" name="contact_address" id="contact_address" maxlength="60" value="[[+fi.contact_address]]" /></p>
-
-      <p><label for="contact_city">City * <span class="error">[[+fi.error.contact_city]]</span></label>
-      <input type="text" name="contact_city" id="contact_city" maxlength="60" value="[[+fi.contact_city]]" /></p>
-
-      <p><label for="contact_state">State * <span class="error">[[+fi.error.contact_state]]</span></label>
-      <input type="text" name="contact_state" id="contact_state" maxlength="60" value="[[+fi.contact_state]]" /></p>
-      
-      <p><label for="contact_postcode">Zip / Postcode * <span class="error">[[+fi.error.contact_postcode]]</span></label>
-      <input type="text" name="contact_postcode" id="contact_postcode" maxlength="60" value="[[+fi.contact_postcode]]" /></p>
-      
-      <p><label for="contact_country">Country * <span class="error">[[+fi.error.contact_country]]</span></label>
-      <input type="text" name="contact_country" id="contact_country" maxlength="60" value="[[+fi.contact_country]]" /></p>            
-  
-      <p><label for="contact_email">Email * <span class="error">[[+fi.error.contact_email]]</span></label>
-      <input type="text" name="contact_email" id="contact_email" size="40" maxlength="40" value="[[+fi.contact_email]]" /></p>
-      
-      <p><label for="contact_phone">Phone</label>
-      <input type="text" name="contact_phone" id="contact_phone" maxlength="60" value="[[+fi.contact_phone]]" /></p>      
-      
-      <p><label for="contact_best-time">Best contact time</label>
-      <input type="text" name="contact_best-time" id="contact_best-time" maxlength="60" value="[[+fi.contact_best-time]]" /></p>
-
-      <p><label for="contact_request-quote">Send me a quotation on</label>
-      <input type="text" name="contact_request-quote" id="contact_request-quote" maxlength="60" value="[[+fi.contact_request-quote]]" /></p>
-
-      <p><label for="contact_request-information">Send me information about</label>
-      <input type="text" name="contact_request-information" id="contact_request-information" maxlength="60" value="[[+fi.contact_request-information]]" /></p>
-  
-      <p><label for="contact_text">Questions / Comments</label>
-      <textarea cols="40" rows="4" name="contact_text" id="contact_text">[[+fi.contact_text]]</textarea></p>
-  
-     <p><input type="image" name="submit" class="submit" alt="Submit" src="assets/images/global/submit.png" /></p>
-  
-  </form>
-  ';
 	}
 }
 ?>

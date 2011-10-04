@@ -78,6 +78,7 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 	function __construct(string $id, string $label, array $values, string $defaultValue) {
 		parent::__construct($id,$label);
 		$this->_values = $values;
+		$this->_defaultVal = $defaultValue;
 	}
 	
 	public function outputHTML(){
@@ -89,14 +90,67 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 		$b_selectUsed=false;
 		$s_ret='<select id="'.htmlentities($this->_id).'" name="'.htmlentities($this->_id).'">'."\r\n";
 		foreach($this->_values as $key=>$value){
-			$s_ret.='<option value="'.htmlentities($key).'"';
-			if($b_selectUsed===false && $selectedVal==$key){
-				$s_ret.=' selected="selected"';
-				$b_selectUsed=true;
+			$selectedStr='';
+			if(isset($_POST[$this->_id])===true){
+				$selectedStr='[[!+fi.'.htmlentities($this->_id).':FormItIsSelected=`'.htmlentities($key).'`]]';
+			}else{
+				if($this->_defaultVal==$key){
+					$selectedStr=' selected="selected"';
+				}
 			}
-			$s_ret.='>'.htmlentities($value).'</option>'."\r\n";
+			$s_ret.='<option value="'.htmlentities($key).'"'.$selectedStr.'>'.htmlentities($value).'</option>'."\r\n";
 		}
 		$s_ret.='</select>';
+		return $s_ret;
+	}
+}
+class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
+	private $_values;
+	private $_defaultVal;
+	private $_showIndividualLabels;
+	/**
+	 * FormIt constructor
+	 *
+	 * @param string $id Id of the element
+	 * @param string $label Label of the select element
+	 * @param array $values Array of title/value arrays in order of display.
+	 */
+	function __construct(string $id, string $label, array $values, string $defaultValue) {
+		parent::__construct($id,$label);
+		$this->_values = $values;
+		$this->_showIndividualLabels = true;
+		$this->_defaultVal = $defaultValue;
+	}
+	
+	public function showIndividualLabels($v){
+		if(func_num_args() == 0) {
+			return $this->_showIndividualLabels;
+		}else{
+			$this->_showIndividualLabels = FormItBuilder::forceBool(func_get_arg(0));
+		}
+	}
+	
+	public function outputHTML(){
+		$s_ret='<div class="radioGroupWrap">';
+		$i=0;
+		foreach($this->_values as $key=>$value){
+			$s_ret.='<div class="radioWrap">';
+			if($this->_showIndividualLabels===true){
+				$s_ret.='<label for="'.htmlentities($this->_id.'_'.$i).'">'.htmlentities($value).'</label>';
+			}
+			$s_ret.='<div class="radioEl"><input type="radio" id="'.htmlentities($this->_id.'_'.$i).'" name="'.htmlentities($this->_id).'" value="'.htmlentities($key).'"';
+			$selectedStr='';
+			if(isset($_POST[$this->_id])===true){
+				$selectedStr='[[!+fi.'.htmlentities($this->_id).':FormItIsChecked=`'.htmlentities($key).'`]]';
+			}else{
+				if($this->_defaultVal==$key){
+					$selectedStr=' checked="checked"';
+				}
+			}
+			$s_ret.=$selectedStr.' /></div></div>'."\r\n";
+			$i++;
+		}
+		$s_ret.='</div>';
 		return $s_ret;
 	}
 }
@@ -135,6 +189,48 @@ class FormItBuilder_elementButton extends FormItBuilder_element{
 			}
 		}
 		$s_ret.=' />';
+		return $s_ret;
+	}
+}
+
+class FormItBuilder_elementTextArea extends FormItBuilder_element{
+	//TODO - Add getters and setters
+	private $_defaultVal;
+	private $_rows;
+	private $_cols;
+
+	/**
+	 * FormItBuilder_elementTextArea Constructor
+	 * @param string $id Id of text area
+	 * @param string $label Label of text area
+	 * @param int $rows The required rows attribute value that must be set on a valid XHTML textarea tag.
+	 * @param int $cols The required cols attribute value that must be set on a valid XHTML textarea tag.
+	 * @param string $defaultValue Default text to appear in text area.
+	 */
+	function __construct( string $id, string $label, int $rows, int $cols, string $defaultValue=NULL) {
+		parent::__construct($id,$label);
+		$this->_defaultVal = $defaultValue;
+		$this->_rows = FormItBuilderCore::forceNumber($rows);
+		$this->_cols = FormItBuilderCore::forceNumber($cols);
+	}
+	
+	public function outputHTML(){
+		//hidden field with same name is so we get a post value regardless of tick status
+		if(isset($_POST[$this->_id])===true){
+			$selectedStr='[[!+fi.'.htmlentities($this->_id).']]';
+		}else{
+			$selectedStr=$this->_defaultVal;
+		}
+		if($this->_required===true){
+			$a_classes[]='required'; // for jquery validate (or for custom CSSing :) )
+		}
+		
+		$s_ret='<textarea id="'.htmlentities($this->_id).'" rows="'.htmlentities($this->_rows).'" cols="'.htmlentities($this->_cols).'" name="'.htmlentities($this->_id).'"';
+		//add classes last
+		if(count($a_classes)>0){
+			$s_ret.=' class="'.implode(' ',$a_classes).'"';
+		}
+		$s_ret.='>'.$selectedStr.'</textarea>';
 		return $s_ret;
 	}
 }
