@@ -94,7 +94,7 @@ $o_form->setHooks(array('spam','email','redirect'));
 $o_form->setRedirectDocument(true);
 $o_form->addRules($a_formRules);
 $o_form->setPostHookName($snippetName);
-$o_form->setEmailToAddress('marcus@datawebnet.com.au');
+$o_form->setEmailToAddress('youraddress@omain.com');
 $o_form->setEmailFromAddress('[[+email_address]]');
 $o_form->setEmailSubject('MyCompany Contact Form Submission - From: [[+name_full]]');
 $o_form->setEmailHeadHtml('<p>This is a response sent by [[+name_full]] using the contact us form:</p>');
