@@ -1,5 +1,9 @@
 Changelog for FormItBuilder.
 
+FormItBuilder 0.1.6
+====================================
+- Documentation Updates and small tweak to example snippet
+
 FormItBuilder 0.1.5
 ====================================
 - First public release. Still a big work in progress.

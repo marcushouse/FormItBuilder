@@ -91,7 +91,7 @@ $a_formRules[] = new FormRule(FormRuleType::fieldMatch, array($o_fe_userPass2,$o
 /*----------------------------*/
 $o_form = new FormItBuilder($modx,'myContactForm');
 $o_form->setHooks(array('spam','email','redirect'));
-$o_form->setRedirectDocument(true);
+$o_form->setRedirectDocument(1); //document to redirect to after successfull submission
 $o_form->addRules($a_formRules);
 $o_form->setPostHookName($snippetName);
 $o_form->setEmailToAddress('youraddress@omain.com');
