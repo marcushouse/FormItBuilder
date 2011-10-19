@@ -13,7 +13,6 @@ FormItBuilders main purpose is to act as a wrapper to simplify much of the FormI
 To use follow the instructions below and check out the example snippet. There will be much more functionality and help information to come.
 
 Need a feature or form element that is not yet supported or documented? Please visit the documentation link below and fill out the contact form.
-
 -------------------------
 INSTALLATION INSTRUCTIONS
 -------------------------
