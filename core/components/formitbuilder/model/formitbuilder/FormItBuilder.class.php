@@ -94,7 +94,8 @@ class FormItBuilder extends FormItBuilderCore{
 			$this->addElement($o_formElement);
 		}
 	}
-	public function postHook(){
+	
+	private function getPostHookString(){
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
 		
 		$s_ret='<div style="'.$s_style.'">'.$this->_emailHeadHtml
@@ -112,7 +113,7 @@ class FormItBuilder extends FormItBuilderCore{
 					if($rowCount%2==0){
 						$bgCol=$bgCol2;
 					}
-					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlentities($o_el->getLabel()).':</b></td><td>[[+'.htmlentities($o_el->getId()).':nl2br]]</td></tr>';
+					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlspecialchars($o_el->getLabel()).':</b></td><td>[[+'.htmlspecialchars($o_el->getId()).':nl2br]]</td></tr>';
 					$rowCount++;
 					
 				}
@@ -120,9 +121,16 @@ class FormItBuilder extends FormItBuilderCore{
 		}
 
 		$s_ret.='</table>'
-		.'<p>You can use this link to reply: <a href="mailto:'.htmlentities($this->_emailFromAddress).'?subject=RE:'.htmlentities($this->_emailSubject).'">'.htmlentities($this->_emailFromAddress).'</a></p>'
+		.'<p>You can use this link to reply: <a href="mailto:'.htmlspecialchars($this->_emailFromAddress).'?subject=RE:'.htmlspecialchars($this->_emailSubject).'">'.htmlspecialchars($this->_emailFromAddress).'</a></p>'
 		.'</div>';
 		return $s_ret;
+	}
+	public function postHook(){
+		return $this->getPostHookString();
+	}
+	public function postHookRaw(){
+		echo $this->getPostHookString();
+		exit();
 	}
 	private function jqueryValidateJSON($jqFieldProps,$jqFieldMessages,$jqFormRules,$jqFormMessages){
 		$a_ruleSegs = array();
@@ -161,8 +169,8 @@ class FormItBuilder extends FormItBuilderCore{
 		
 		return $s_js;
 	}
-
-	public function output(){
+	
+	private function getFormItBuilderOutput(){
 		$s_submitVar = 'submitVar_'.$this->_id;
 		$nl="\r\n";
 
@@ -253,7 +261,7 @@ class FormItBuilder extends FormItBuilderCore{
 		}
 		
 		//build html
-		$s_form='<form action="[[~[[*id]]]]" method="'.htmlentities($this->_method).'" class="form" id="'.htmlentities($this->_id).'"><div>'.$nl
+		$s_form='<form action="[[~[[*id]]]]" method="'.htmlspecialchars($this->_method).'" class="form" id="'.htmlspecialchars($this->_id).'"><div>'.$nl
 		.$nl.'<div class="process_errors_wrap"><div class="process_errors">[[!+fi.error_message:notempty=`[[!+fi.error_message]]`]]</div></div>'
 		.$nl.'<input type="hidden" name="'.$s_submitVar.'" value="1" />'
 		.$nl.'<input type="hidden" name="fke'.date('Y').'Sp'.date('m').'Blk:blank" value="" /><!-- additional crude spam block. If this field ends up with data it will fail to submit -->'
@@ -262,17 +270,17 @@ class FormItBuilder extends FormItBuilderCore{
 			if(is_a($o_el,'FormItBuilder_htmlBlock')){
 				$s_form.=$o_el->outputHTML();
 			}else{
-				$s_form.='<div class="formSegWrap formSegWrap_'.htmlentities($o_el->getId()).'">';
+				$s_form.='<div class="formSegWrap formSegWrap_'.htmlspecialchars($o_el->getId()).'">';
 					if($o_el->showLabel()===true){
 						$forId=$o_el->getId();
 						if(is_a($o_el,'FormItBuilder_elementRadioGroup')===true){
 							$forId=$o_el->getId().'_0';
 						}
-						$s_form.=$nl.'  <label class="mainElLabel" for="'.htmlentities($forId).'">'.htmlentities($o_el->getLabel()).'</label>';
+						$s_form.=$nl.'  <label class="mainElLabel" for="'.htmlspecialchars($forId).'">'.$o_el->getLabel().'</label>';
 					}
 					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
 					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <div class="errorContainer"><label class="error" for="'.htmlentities($o_el->getId()).'">[[+fi.error.'.htmlentities($o_el->getId()).']]</label></div>';
+						$s_form.=$nl.'  <div class="errorContainer"><label class="error" for="'.htmlspecialchars($o_el->getId()).'">[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
 					}
 					$s_form.=$nl.'  </div>';
 				$s_form.=$nl.'</div>'.$nl;
@@ -348,10 +356,15 @@ $this->jqueryValidateJSON(
 </script>
 ';
 		}
-		
-		//for debugging
-		//echo $s_formItCmd.$s_form; exit();
 		return $s_formItCmd.$s_form.$s_js;
+	}
+
+	public function output(){
+		return $this->getFormItBuilderOutput();
+	}
+	
+	public function outputRaw(){
+		echo $this->getFormItBuilderOutput(); exit();
 	}
 }
 ?>

@@ -88,17 +88,17 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 			$selectedVal=$this->_defaultVal;
 		}
 		$b_selectUsed=false;
-		$s_ret='<select id="'.htmlentities($this->_id).'" name="'.htmlentities($this->_id).'">'."\r\n";
+		$s_ret='<select id="'.htmlspecialchars($this->_id).'" name="'.htmlspecialchars($this->_id).'">'."\r\n";
 		foreach($this->_values as $key=>$value){
 			$selectedStr='';
 			if(isset($_POST[$this->_id])===true){
-				$selectedStr='[[!+fi.'.htmlentities($this->_id).':FormItIsSelected=`'.htmlentities($key).'`]]';
+				$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).':FormItIsSelected=`'.htmlspecialchars($key).'`]]';
 			}else{
 				if($this->_defaultVal==$key){
 					$selectedStr=' selected="selected"';
 				}
 			}
-			$s_ret.='<option value="'.htmlentities($key).'"'.$selectedStr.'>'.htmlentities($value).'</option>'."\r\n";
+			$s_ret.='<option value="'.htmlspecialchars($key).'"'.$selectedStr.'>'.htmlspecialchars($value).'</option>'."\r\n";
 		}
 		$s_ret.='</select>';
 		return $s_ret;
@@ -136,12 +136,12 @@ class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
 		foreach($this->_values as $key=>$value){
 			$s_ret.='<div class="radioWrap">';
 			if($this->_showIndividualLabels===true){
-				$s_ret.='<label for="'.htmlentities($this->_id.'_'.$i).'">'.htmlentities($value).'</label>';
+				$s_ret.='<label for="'.htmlspecialchars($this->_id.'_'.$i).'">'.htmlspecialchars($value).'</label>';
 			}
-			$s_ret.='<div class="radioEl"><input type="radio" id="'.htmlentities($this->_id.'_'.$i).'" name="'.htmlentities($this->_id).'" value="'.htmlentities($key).'"';
+			$s_ret.='<div class="radioEl"><input type="radio" id="'.htmlspecialchars($this->_id.'_'.$i).'" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($key).'"';
 			$selectedStr='';
 			if(isset($_POST[$this->_id])===true){
-				$selectedStr='[[!+fi.'.htmlentities($this->_id).':FormItIsChecked=`'.htmlentities($key).'`]]';
+				$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).':FormItIsChecked=`'.htmlspecialchars($key).'`]]';
 			}else{
 				if($this->_defaultVal==$key){
 					$selectedStr=' checked="checked"';
@@ -174,18 +174,18 @@ class FormItBuilder_elementButton extends FormItBuilder_element{
 		if($type=='button' || $type=='reset' || $type=='submit' || $type=='image'){
 			//ok -- valid type
 		}else{
-			FormItBuilder::throwError('[Element: '.$this->_id.'] Button "'.htmlentities($type).'" must be of type "button", "reset", "image" or "submit"');
+			FormItBuilder::throwError('[Element: '.$this->_id.'] Button "'.htmlspecialchars($type).'" must be of type "button", "reset", "image" or "submit"');
 		}
 		$this->_type = $type;
 	}
 	
 	public function outputHTML(){
-		$s_ret='<input id="'.htmlentities($this->_id).'" type="'.htmlentities($this->_type).'" value="'.htmlentities($this->_label).'"';
+		$s_ret='<input id="'.htmlspecialchars($this->_id).'" type="'.htmlspecialchars($this->_type).'" value="'.htmlspecialchars($this->_label).'"';
 		if($this->_type=='image'){
 			if($this->_src===NULL){
 				FormItBuilder::throwError('[Element: '.$this->_id.'] Button of type "image" must have a src set.');
 			}else{
-				$s_ret.=' src="'.htmlentities($this->_src).'"';
+				$s_ret.=' src="'.htmlspecialchars($this->_src).'"';
 			}
 		}
 		$s_ret.=' />';
@@ -217,7 +217,7 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 	public function outputHTML(){
 		//hidden field with same name is so we get a post value regardless of tick status
 		if(isset($_POST[$this->_id])===true){
-			$selectedStr='[[!+fi.'.htmlentities($this->_id).']]';
+			$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).']]';
 		}else{
 			$selectedStr=$this->_defaultVal;
 		}
@@ -225,7 +225,7 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 			$a_classes[]='required'; // for jquery validate (or for custom CSSing :) )
 		}
 		
-		$s_ret='<textarea id="'.htmlentities($this->_id).'" rows="'.htmlentities($this->_rows).'" cols="'.htmlentities($this->_cols).'" name="'.htmlentities($this->_id).'"';
+		$s_ret='<textarea id="'.htmlspecialchars($this->_id).'" rows="'.htmlspecialchars($this->_rows).'" cols="'.htmlspecialchars($this->_cols).'" name="'.htmlspecialchars($this->_id).'"';
 		//add classes last
 		if(count($a_classes)>0){
 			$s_ret.=' class="'.implode(' ',$a_classes).'"';
@@ -277,8 +277,8 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 			$a_uncheckedVal=''; // we do this because FormIt will not validate it as empty if unchecked value has a value.
 		}
 		//hidden field with same name is so we get a post value regardless of tick status
-		$s_ret='<input type="hidden" name="'.htmlentities($this->_id).'" value="'.htmlentities($a_uncheckedVal).'" />'
-		.'<input type="checkbox" id="'.htmlentities($this->_id).'" name="'.htmlentities($this->_id).'" value="'.htmlentities($this->_value).'" [[!+fi.'.htmlentities($this->_id).':FormItIsChecked=`'.htmlentities($this->_value).'`]] />';
+		$s_ret='<input type="hidden" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($a_uncheckedVal).'" />'
+		.'<input type="checkbox" id="'.htmlspecialchars($this->_id).'" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($this->_value).'" [[!+fi.'.htmlspecialchars($this->_id).':FormItIsChecked=`'.htmlspecialchars($this->_value).'`]] />';
 		return $s_ret;
 	}
 }
@@ -378,9 +378,9 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	
 	public function outputHTML(){
 		$a_classes=array();
-		$s_ret='<input type="'.$this->_fieldType.'" name="'.htmlentities($this->_id).'" id="'.htmlentities($this->_id).'" value="[[+fi.'.htmlentities($this->_id).']]"';
+		$s_ret='<input type="'.$this->_fieldType.'" name="'.htmlspecialchars($this->_id).'" id="'.htmlspecialchars($this->_id).'" value="[[+fi.'.htmlspecialchars($this->_id).']]"';
 		if($this->_maxLength!==NULL){
-			$s_ret.=' maxlength="'.htmlentities($this->_maxLength).'"';
+			$s_ret.=' maxlength="'.htmlspecialchars($this->_maxLength).'"';
 		}
 		if($this->_required===true){
 			$a_classes[]='required'; // for jquery validate (or for custom CSSing :) )
