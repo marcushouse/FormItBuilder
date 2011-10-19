@@ -23,6 +23,7 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_emailFontFamily;
 	private $_emailHeadHtml;
 	private $_rules;
+	private $_emailTpl;
 
 	/**
 	*
@@ -37,6 +38,7 @@ class FormItBuilder extends FormItBuilderCore{
 		$this->_rules=array();
 		$this->_redirectDocument=$this->modx->resource->get('id');
 		$this->_jqueryValidation=false;
+		$this->_emailTpl='FormItBuilderEmailTpl';
 		
 		$this->_emailFontSize='13px';
 		$this->_emailFontFamily='Helvetica,Arial,sans-serif';
@@ -75,6 +77,7 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getEmailSubject() { return $this->_emailSubject; }
 	public function getEmailHeadHtml() { return $this->_emailHeadHtml; }
 	public function getHooks() { return $this->_hooks; }
+	public function getEmailTpl() { return $this->_emailTpl; }
 	
 	public function setMethod($v) { $this->_method = $v; } 
 	public function setRedirectDocument($v) { $this->_redirectDocument = $v; } 
@@ -85,6 +88,7 @@ class FormItBuilder extends FormItBuilderCore{
 	public function setEmailSubject($v) { $this->_emailSubject = $v; }
 	public function setEmailHeadHtml($v) { $this->_emailHeadHtml = $v; }
 	public function setHooks($v){$this->_hooks = self::forceArray($v);}
+	public function setEmailTpl($v){$this->_emailTpl = $v;}
         
 	public function addElement(FormItBuilder_element $o_formElement){
 		$this->_formElements[]=$o_formElement;
@@ -312,7 +316,7 @@ class FormItBuilder extends FormItBuilderCore{
 		}
 		$s_formItCmd='[[!FormIt?'
 		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?','.implode(',',$this->_hooks):'').'`'
-		.$nl.'&emailTpl=`FormItBuilderEmailTpl`'
+		.$nl.'&emailTpl=`'.$this->_emailTpl.'`'
 		.(isset($this->_emailToAddress)?$nl.'&emailTo=`'.$this->_emailToAddress.'`':'')
 		.(isset($this->_emailFromAddress)?$nl.'&emailFrom=`'.$this->_emailFromAddress.'`':'')
 		.$nl.'&emailSubject=`'.$this->_emailSubject.'`'
