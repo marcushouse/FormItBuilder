@@ -1,5 +1,10 @@
 Changelog for FormItBuilder.
 
+FormItBuilder 0.1.7
+====================================
+- Fixed escaping issues for special characters (Should have been using htmlspecialchars instead of htmlentities)
+- Added methods for outputRaw and postHookRaw to allow a raw dump of formIt syntax and emailChunkSyntax.
+
 FormItBuilder 0.1.6
 ====================================
 - Documentation Updates and small tweak to example snippet

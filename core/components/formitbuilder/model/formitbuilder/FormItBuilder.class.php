@@ -96,10 +96,11 @@ class FormItBuilder extends FormItBuilderCore{
 	}
 	
 	private function getPostHookString(){
+		$NL="\r\n";
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
 		
-		$s_ret='<div style="'.$s_style.'">'.$this->_emailHeadHtml
-		.'<table cellpadding="4" cellspacing="0" style="'.$s_style.'">';
+		$s_ret='<div style="'.$s_style.'">'.$NL.$this->_emailHeadHtml.$NL
+		.'<table cellpadding="4" cellspacing="0" style="'.$s_style.'">'.$NL;
 		
 		$bgCol1="#FFFFFF";
 		$bgCol2="#e4edf9";
@@ -113,15 +114,15 @@ class FormItBuilder extends FormItBuilderCore{
 					if($rowCount%2==0){
 						$bgCol=$bgCol2;
 					}
-					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlspecialchars($o_el->getLabel()).':</b></td><td>[[+'.htmlspecialchars($o_el->getId()).':nl2br]]</td></tr>';
+					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlspecialchars($o_el->getLabel()).':</b></td><td>[[+'.htmlspecialchars($o_el->getId()).':nl2br]]</td></tr>'.$NL;
 					$rowCount++;
 					
 				}
 			}
 		}
 
-		$s_ret.='</table>'
-		.'<p>You can use this link to reply: <a href="mailto:'.htmlspecialchars($this->_emailFromAddress).'?subject=RE:'.htmlspecialchars($this->_emailSubject).'">'.htmlspecialchars($this->_emailFromAddress).'</a></p>'
+		$s_ret.='</table>'.$NL
+		.'<p>You can use this link to reply: <a href="mailto:'.htmlspecialchars($this->_emailFromAddress).'?subject=RE:'.htmlspecialchars($this->_emailSubject).'">'.htmlspecialchars($this->_emailFromAddress).'</a></p>'.$NL
 		.'</div>';
 		return $s_ret;
 	}
