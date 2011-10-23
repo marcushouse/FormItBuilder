@@ -87,7 +87,12 @@ class FormRule extends FormItBuilderCore{
 					$this->_validationMessage = $element->getLabel().' must not be less than '.$value;
 					$element->setMinValue($value);
 				}
-				break;					
+				break;	
+			case FormRuleType::file:
+				if($validationMessage===NULL){
+					 $this->_validationMessage = $element->getLabel().' must be a valid file.';
+				}
+			break;				
 			default:
 				FormItBuilder::throwError('Type "'.$type.'" not valid. Recommend using FormRule constant');
 				break;

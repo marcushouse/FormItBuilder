@@ -9,6 +9,7 @@ class FormRuleType extends FormItBuilderCore{
 	const maximumLength = 'maximumLength';
 	const minimumValue = 'minimumValue';
 	const maximumValue = 'maximumValue';
+	const file = 'file';
 }
 
 ?>

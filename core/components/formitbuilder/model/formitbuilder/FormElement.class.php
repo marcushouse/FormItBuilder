@@ -288,6 +288,12 @@ class FormItBuilder_elementPassword extends FormItBuilder_elementText{
 		$this->_fieldType='password';
 	}
 }
+class FormItBuilder_elementFile extends FormItBuilder_elementText{
+	function __construct( string $id, string $label ) {
+		parent::__construct($id,$label);
+		$this->_fieldType='file';
+	}
+}
 class FormItBuilder_elementText extends FormItBuilder_element{
 	
 	protected $_fieldType;

@@ -20,6 +20,8 @@ $o_fe_postcode		= new FormItBuilder_elementText('postcode','Post Code');
 $o_fe_company		= new FormItBuilder_elementText('company','Company Name');
 $o_fe_companyPhone	= new FormItBuilder_elementText('company_phone','Company Phone');
 $o_fe_email			= new FormItBuilder_elementText('email_address','Email Address');
+$o_fe_file			= new FormItBuilder_elementFile('resume', 'Resume');
+
 //Check Boxes
 $o_fe_checkTerms	= new FormItBuilder_elementCheckbox('agree_terms','I agree to the terms & conditions', 'Agree', 'Disagree', false);
 $o_fe_checkNews		= new FormItBuilder_elementCheckbox('agree_newsletter','Sign me up for some spam', 'Wants Spam', 'Does <strong>NOT</strong> want spam', false);
@@ -94,7 +96,7 @@ $o_form->setHooks(array('spam','email','redirect'));
 $o_form->setRedirectDocument(1); //document to redirect to after successfull submission
 $o_form->addRules($a_formRules);
 $o_form->setPostHookName($snippetName);
-$o_form->setEmailToAddress('youraddress@omain.com');
+$o_form->setEmailToAddress('youraddress@domain.com');
 $o_form->setEmailFromAddress('[[+email_address]]');
 $o_form->setEmailSubject('MyCompany Contact Form Submission - From: [[+name_full]]');
 $o_form->setEmailHeadHtml('<p>This is a response sent by [[+name_full]] using the contact us form:</p>');
@@ -108,7 +110,7 @@ $o_form->addElements(
 		new FormItBuilder_htmlBlock('<hr class="formSpltter" /><h2>Address</h2>'),
 		$o_fe_address,	$o_fe_city,	$o_fe_usstates, $o_fe_postcode,
 		new FormItBuilder_htmlBlock('<hr class="formSpltter" /><h2>Company Information</h2>'),
-		$o_fe_company,	$o_fe_companyPhone, $o_fe_employees, $o_fe_staff, $o_fe_notes,
+		$o_fe_company,	$o_fe_companyPhone, $o_fe_employees, $o_fe_staff, $o_fe_notes, $o_fe_file,
 		new FormItBuilder_htmlBlock('<hr class="formSpltter" /><div class="checkboxes">'),
 		$o_fe_checkNews, $o_fe_checkTerms,
 		new FormItBuilder_htmlBlock('</div>'),

@@ -3,6 +3,10 @@ Changelog for FormItBuilder.
 FormItBuilder 0.1.8-beta
 ====================================
 - Added ability to alter dynamic emailTpl
+- Added file support*
+- Added customValidators (see customValidators property for formIt)*
+- Added validate (to allow extra validate options to be set)*
+* Thanks for the assistance Adam!
 
 FormItBuilder 0.1.7-beta
 ====================================

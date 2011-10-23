@@ -24,6 +24,8 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_emailHeadHtml;
 	private $_rules;
 	private $_emailTpl;
+	private $_validate;
+	private $_customValidators; 
 
 	/**
 	*
@@ -78,6 +80,8 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getEmailHeadHtml() { return $this->_emailHeadHtml; }
 	public function getHooks() { return $this->_hooks; }
 	public function getEmailTpl() { return $this->_emailTpl; }
+	public function getValidate() { return $this->_validate; }
+	public function getCustomValidators() { return $this->_customValidators; }
 	
 	public function setMethod($v) { $this->_method = $v; } 
 	public function setRedirectDocument($v) { $this->_redirectDocument = $v; } 
@@ -89,7 +93,9 @@ class FormItBuilder extends FormItBuilderCore{
 	public function setEmailHeadHtml($v) { $this->_emailHeadHtml = $v; }
 	public function setHooks($v){$this->_hooks = self::forceArray($v);}
 	public function setEmailTpl($v){$this->_emailTpl = $v;}
-        
+	public function setValidate($v) { $this->_validate = $v; }
+	public function setCustomValidators($v) { $this->_customValidators = $v; }
+    
 	public function addElement(FormItBuilder_element $o_formElement){
 		$this->_formElements[]=$o_formElement;
 	}
@@ -114,11 +120,24 @@ class FormItBuilder extends FormItBuilderCore{
 				//do nothing
 			}else{
 				if($o_el->showInEmail()===true){
+					
 					$bgCol=$bgCol1;
 					if($rowCount%2==0){
 						$bgCol=$bgCol2;
 					}
-					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlspecialchars($o_el->getLabel()).':</b></td><td>[[+'.htmlspecialchars($o_el->getId()).':nl2br]]</td></tr>'.$NL;
+
+					$elType=get_class($o_el);
+					$elId = $o_el->getId();
+					$s_val='[[+'.htmlspecialchars($o_el->getId()).':nl2br]]';
+					if($elType=='FormItBuilder_elementFile'){
+						if(isset($_FILES[$elId])){
+							if($_FILES[$elId]['size']==0){
+								$s_val='None';
+							}
+						}
+					}
+					
+					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlspecialchars($o_el->getLabel()).':</b></td><td>'.$s_val.'</td></tr>'.$NL;
 					$rowCount++;
 					
 				}
@@ -261,17 +280,21 @@ class FormItBuilder extends FormItBuilderCore{
 					$a_fieldProps_errstringFormIt[$elID][] = 'vTextRequired=`'.$rule->getValidationMessage().'`';
 					$a_fieldProps_errstringJq[$elID][] = 'required:"'.$rule->getValidationMessage().'"';
 					break;
-
 			}
 		}
 		
-		//build html
-		$s_form='<form action="[[~[[*id]]]]" method="'.htmlspecialchars($this->_method).'" class="form" id="'.htmlspecialchars($this->_id).'"><div>'.$nl
+		//build inner form html
+		$b_attachmentIncluded=false;
+		$s_form='<div>'.$nl
 		.$nl.'<div class="process_errors_wrap"><div class="process_errors">[[!+fi.error_message:notempty=`[[!+fi.error_message]]`]]</div></div>'
 		.$nl.'<input type="hidden" name="'.$s_submitVar.'" value="1" />'
 		.$nl.'<input type="hidden" name="fke'.date('Y').'Sp'.date('m').'Blk:blank" value="" /><!-- additional crude spam block. If this field ends up with data it will fail to submit -->'
 		.$nl;
 		foreach($this->_formElements as $o_el){
+			$s_elClass=get_class($o_el);
+			if($s_elClass=='FormItBuilder_elementFile'){
+				$b_attachmentIncluded=true;
+			}
 			if(is_a($o_el,'FormItBuilder_htmlBlock')){
 				$s_form.=$o_el->outputHTML();
 			}else{
@@ -291,7 +314,12 @@ class FormItBuilder extends FormItBuilderCore{
 				$s_form.=$nl.'</div>'.$nl;
 			}
 		}
-		$s_form.=$nl.'</div></form>';
+		$s_form.=$nl.'</div>';
+
+		//wrap form elements in form tags
+		$s_form='<form action="[[~[[*id]]]]" method="'.htmlspecialchars($this->_method).'"'.($b_attachmentIncluded?' enctype="multipart/form-data"':'').' class="form" id="'.htmlspecialchars($this->_id).'">'.$nl
+		.$s_form.$nl
+		.'</form>';
 		
 		//add all formit validation rules together in one array for easy implode
 		$a_formItCmds=array();
@@ -324,7 +352,8 @@ class FormItBuilder extends FormItBuilderCore{
 		.$nl.'&redirectTo=`'.$this->_redirectDocument.'`'
 		.$nl.'&submitVar=`'.$s_submitVar.'`'
 		.$nl.implode($nl,$a_formItErrorMessage)
-		.$nl.'&validate=`'.$nl.' ,'.implode(','.$nl.' ',$a_formItCmds).','.$nl.'`]]'.$nl;
+        .(!empty($this->_customValidators)?$nl.'&customValidators=`'.$this->_customValidators.'`':'')
+		.$nl.'&validate=`'.(isset($this->_validate)?$this->_validate.',':'').implode(','.$nl.' ',$a_formItCmds).','.$nl.'`]]'.$nl;
 		
 		if($this->_jqueryValidation===true){
 			$s_js='
