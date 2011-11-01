@@ -64,35 +64,44 @@ class FormRule extends FormItBuilderCore{
 				$value = FormItBuilder::forceNumber($value);
 				if($validationMessage===NULL){
 					$this->_validationMessage = $element->getLabel().' must only contain '.$value.' characters';
-					$element->setMaxLength($value);
 				}
+				$element->setMaxLength($value);
 				break;
 			case FormRuleType::maximumValue:
 				$value = FormItBuilder::forceNumber($value);
 				if($validationMessage===NULL){
 					$this->_validationMessage = $element->getLabel().' must not be greater than '.$value;
-					$element->setMaxValue($value);
 				}
+				$element->setMaxValue($value);
 				break;
 			case FormRuleType::minimumLength:
 				$value = FormItBuilder::forceNumber($value);
 				if($validationMessage===NULL){
 					$this->_validationMessage = $element->getLabel().' must be at least '.$value.' characters';
-					$element->setMinLength($value);
 				}
+				$element->setMinLength($value);
 				break;
 			case FormRuleType::minimumValue:
 				$value = FormItBuilder::forceNumber($value);
 				if($validationMessage===NULL){
 					$this->_validationMessage = $element->getLabel().' must not be less than '.$value;
-					$element->setMinValue($value);
 				}
+				$element->setMinValue($value);
 				break;	
+			case FormRuleType::date:
+				$value=strtolower(trim($value));
+				if(empty($value)===true){
+					FormItBuilder::throwError('Date type field must have a value (date format) specified.');
+				}
+				if($validationMessage===NULL){
+					$this->_validationMessage = $element->getLabel().' must be a valid date (===dateformat===).';
+				}
+				break;
 			case FormRuleType::file:
 				if($validationMessage===NULL){
 					 $this->_validationMessage = $element->getLabel().' must be a valid file.';
 				}
-			break;				
+				break;			
 			default:
 				FormItBuilder::throwError('Type "'.$type.'" not valid. Recommend using FormRule constant');
 				break;

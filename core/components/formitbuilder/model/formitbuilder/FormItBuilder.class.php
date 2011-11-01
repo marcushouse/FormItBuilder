@@ -205,6 +205,7 @@ class FormItBuilder extends FormItBuilderCore{
 		$a_fieldProps_errstringJq=array();
 		
 		$a_formProps=array();
+		$a_formProps_custValidate=array();
 		$a_formProps_jqValidate=array();
 		$a_formPropsFormItErrorStrings=array();
 		$a_formPropsJqErrorStrings=array();
@@ -217,7 +218,9 @@ class FormItBuilder extends FormItBuilderCore{
 				$o_el = $o_elFull;
 			}
 			$elID = $o_el->getId();
-			
+			if(isset($a_fieldProps[$elID])===false){
+				$a_fieldProps[$elID]=array();
+			}
 			if(isset($a_fieldProps[$elID])===false){
 				$a_fieldProps[$elID]=array();
 			}
@@ -230,6 +233,10 @@ class FormItBuilder extends FormItBuilderCore{
 			if(isset($a_fieldProps_errstringJq[$elID])===false){
 				$a_fieldProps_errstringJq[$elID]=array();
 			}
+			if(isset($a_formProps_custValidate[$elID])===false){
+				$a_formProps_custValidate[$elID]=array();
+			}
+			
 			
 			switch($rule->getType()){
 				case FormRuleType::email:
@@ -239,31 +246,31 @@ class FormItBuilder extends FormItBuilderCore{
 					$a_fieldProps_errstringJq[$elID][] = 'email:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::fieldMatch:
-					$a_fieldProps[$elID][] = 'password_confirm=`'.$o_elFull[1]->getId().'`';
+					$a_fieldProps[$elID][] = 'password_confirm=^'.$o_elFull[1]->getId().'^';
 					$a_fieldProps_jqValidate[$elID][] = 'equalTo:"#'.$o_elFull[1]->getId().'"';
 					$a_fieldProps_errstringFormIt[$elID][] = 'vTextPasswordConfirm=`'.$rule->getValidationMessage().'`';
 					$a_fieldProps_errstringJq[$elID][] = 'equalTo:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::maximumLength:
-					$a_fieldProps[$elID][] = 'maxLength=`'.$rule->getValue().'`';
+					$a_fieldProps[$elID][] = 'maxLength=^'.$rule->getValue().'^';
 					$a_fieldProps_jqValidate[$elID][] = 'maxlength:'.$rule->getValue();
 					$a_fieldProps_errstringFormIt[$elID][] = 'vTextMaxLength=`'.$rule->getValidationMessage().'`';
 					$a_fieldProps_errstringJq[$elID][] = 'maxlength:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::maximumValue:
-					$a_fieldProps[$elID][] = 'maxValue=`'.$rule->getValue().'`';
+					$a_fieldProps[$elID][] = 'maxValue=^'.$rule->getValue().'^';
 					$a_fieldProps_jqValidate[$elID][] = 'max:'.$rule->getValue();
 					$a_fieldProps_errstringFormIt[$elID][] = 'vTextMaxValue=`'.$rule->getValidationMessage().'`';
 					$a_fieldProps_errstringJq[$elID][] = 'max:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::minimumLength:
-					$a_fieldProps[$elID][] = 'minLength=`'.$rule->getValue().'`';
+					$a_fieldProps[$elID][] = 'minLength=^'.$rule->getValue().'^';
 					$a_fieldProps_jqValidate[$elID][] = 'minlength:'.$rule->getValue();
 					$a_fieldProps_errstringFormIt[$elID][] = 'vTextMinLength=`'.$rule->getValidationMessage().'`';
 					$a_fieldProps_errstringJq[$elID][] = 'minlength:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::minimumValue:
-					$a_fieldProps[$elID][] = 'minValue=`'.$rule->getValue().'`';
+					$a_fieldProps[$elID][] = 'minValue=^'.$rule->getValue().'^';
 					$a_fieldProps_jqValidate[$elID][] = 'min:'.$rule->getValue();
 					$a_fieldProps_errstringFormIt[$elID][] = 'vTextMinValue=`'.$rule->getValidationMessage().'`';
 					$a_fieldProps_errstringJq[$elID][] = 'min:"'.$rule->getValidationMessage().'"';
@@ -280,7 +287,23 @@ class FormItBuilder extends FormItBuilderCore{
 					$a_fieldProps_errstringFormIt[$elID][] = 'vTextRequired=`'.$rule->getValidationMessage().'`';
 					$a_fieldProps_errstringJq[$elID][] = 'required:"'.$rule->getValidationMessage().'"';
 					break;
+				case FormRuleType::date:
+					$a_formProps_custValidate[$elID][]=array('type'=>'date','fieldFormat'=>$rule->getValue(),'errorMessage'=>$rule->getValidationMessage());
+					$a_fieldProps[$elID][] = 'FormItBuilder_customValidation';
+					//$a_fieldProps[$elID][] = 'isDate=^'.$rule->getValue().'^';
+					$a_fieldProps_jqValidate[$elID][] = 'date:true';
+					$a_fieldProps_errstringFormIt[$elID][] = 'vTextIsDate=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elID][] = 'digits:"'.$rule->getValidationMessage().'"';
+					break;
 			}
+		}
+		//if some custom validation optiosn were found (date etc) then add formItBuilder custom validate snippet to the list
+		if(count($a_formProps_custValidate)>0){
+			$GLOBALS['FormItBuilder_customValidation']=$a_formProps_custValidate;
+			if(empty($this->_customValidators)===false){
+				$this->_customValidators.=',';
+			}
+			$this->_customValidators.='FormItBuilder_customValidation';
 		}
 		
 		//build inner form html
@@ -298,17 +321,19 @@ class FormItBuilder extends FormItBuilderCore{
 			if(is_a($o_el,'FormItBuilder_htmlBlock')){
 				$s_form.=$o_el->outputHTML();
 			}else{
+				$forId=$o_el->getId();
+				if(is_a($o_el,'FormItBuilder_elementRadioGroup')===true){
+					$forId=$o_el->getId().'_0';
+				}
+				
 				$s_form.='<div class="formSegWrap formSegWrap_'.htmlspecialchars($o_el->getId()).'">';
 					if($o_el->showLabel()===true){
-						$forId=$o_el->getId();
-						if(is_a($o_el,'FormItBuilder_elementRadioGroup')===true){
-							$forId=$o_el->getId().'_0';
-						}
+
 						$s_form.=$nl.'  <label class="mainElLabel" for="'.htmlspecialchars($forId).'">'.$o_el->getLabel().'</label>';
 					}
 					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
 					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <div class="errorContainer"><label class="error" for="'.htmlspecialchars($o_el->getId()).'">[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
+						$s_form.=$nl.'  <div class="errorContainer"><label class="error" for="'.htmlspecialchars($forId).'">[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
 					}
 					$s_form.=$nl.'  </div>';
 				$s_form.=$nl.'</div>'.$nl;
@@ -376,6 +401,10 @@ $("#'.$this->_id.'").validate({errorPlacement:function(error, element) {
 	var element= $(el);
 	element.addClass(errorClass).removeClass(validClass);
 	element.parents(".formSegWrap").children(".mainElLabel").addClass("mainLabelError");
+},invalidHandler: function(form, validator){
+	//make nice little animation to scroll to the first invalid element instead of an instant jump
+	var jumpEl = $("#"+validator.errorList[0].element.id).parents(".formSegWrap");
+	$("html,body").animate({scrollTop: jumpEl.offset().top});
 },ignore:":hidden",'.
 					
 $this->jqueryValidateJSON(

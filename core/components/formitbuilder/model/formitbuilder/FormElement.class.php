@@ -302,6 +302,7 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	protected $_minLength;
 	protected $_maxValue;
 	protected $_minValue;
+	protected $_dateFormat;
 	/*
 	protected $_isNumeric;
 	protected $_isEmail;
@@ -325,6 +326,8 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	public function getMinLength() { return $this->_minLength; }
 	public function getMaxValue() { return $this->_maxValue; }
 	public function getMinValue() { return $this->_minValue; }
+	public function getDateFormat() { return $this->_dateFormat; }
+	
 	public function setMaxLength($v) {
 		$v = FormItBuilder::forceNumber($v);
 		if($this->_minLength!==NULL && $this->_minLength>$v){
@@ -361,6 +364,15 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 			FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum value to "'.$v.'" when maximum value is "'.$this->_maxValue.'"');
 		}else{
 			$this->_minValue = FormItBuilder::forceNumber($v);
+		}
+	}
+	
+	public function setDateFormat($v) {
+		$v=trim($v);
+		if(empty($v)===true){
+			FormItBuilder::throwError('[Element: '.$this->_id.'] Date format is not valid.');
+		}else{
+			$this->_dateFormat=$v;
 		}
 	}
 	
