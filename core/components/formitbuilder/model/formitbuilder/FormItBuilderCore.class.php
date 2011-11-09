@@ -63,15 +63,8 @@ class FormItBuilderCore{
 				$newStr=str_replace('mm',$month, $newStr);
 				
 				$yearPos = strpos($format,'yyyy');
-				if($yearPos===false){
-					//if cant find yyyy assume 2 digit year
-					$yearPos = strpos($format,'yy');
-					$year = substr($value,$yearPos,2);
-					$newStr=str_replace('yy',$year, $newStr);
-				}else{
-					$year = substr($value,$yearPos,4);
-					$newStr=str_replace('yyyy',$year, $newStr);
-				}
+				$year = substr($value,$yearPos,4);
+				$newStr=str_replace('yyyy',$year, $newStr);
 				
 				if(@checkdate($month, $day, $year)){
 					$b_retStatus=true;

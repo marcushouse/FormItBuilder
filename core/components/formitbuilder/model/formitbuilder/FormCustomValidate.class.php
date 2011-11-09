@@ -14,11 +14,8 @@ class FormItBuilder_customValidate extends FormItBuilderCore{
 					$returnStatus = $a_formatInfo['status'];
 					$returnValue = $a_formatInfo['value'];
 					$returnExtraInfo = $a_formatInfo;
-					
 					if($returnStatus===false){
-						$errorMsg = str_replace('===dateformat===',$option['fieldFormat'], $option['errorMessage']);
-					}else{
-						
+						$errorMsg = $option['errorMessage'];
 					}
 					break;
 			}

@@ -169,23 +169,6 @@ class FormItBuilder extends FormItBuilderCore{
 				$a_msgSegs[]=$fieldID.':{'.implode(',',$a_fieldMsg).'}';
 			}
 		}
-		/*
-		foreach($jqFieldMessages as $a_formMsg){
-			$a_ruleSegs[]=$a_formMsg;
-			if(count($jqFormMessages)>0){
-				$a_msgSegs[]=$a_formMsg;
-			}
-		}
-		foreach($jqFormRules as $a_formProp){
-			$a_ruleSegs[]=$a_formProp;
-		}
-		foreach($jqFormMessages as $a_formMsg){
-			$a_ruleSegs[]=$a_formProp;
-			if(count($jqFormMessages)>0){
-				$a_msgSegs[]=$a_formMsg;
-			}
-		}
-		*/
 		$s_js=
 		'rules:{  '."\r\n  ".implode(",\r\n  ",$a_ruleSegs)."\r\n".'},'.
 		'messages:{  '."\r\n  ".implode(",\r\n  ",$a_msgSegs)."\r\n".'}'
@@ -196,6 +179,10 @@ class FormItBuilder extends FormItBuilderCore{
 	
 	private function getFormItBuilderOutput(){
 		$s_submitVar = 'submitVar_'.$this->_id;
+		$b_posted = false;
+		if(isset($_REQUEST[$s_submitVar])===true){
+			$b_posted=true;
+		}
 		$nl="\r\n";
 
 		//process and add form rules
@@ -288,12 +275,15 @@ class FormItBuilder extends FormItBuilderCore{
 					$a_fieldProps_errstringJq[$elID][] = 'required:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::date:
-					$a_formProps_custValidate[$elID][]=array('type'=>'date','fieldFormat'=>$rule->getValue(),'errorMessage'=>$rule->getValidationMessage());
+					$s_thisVal = $rule->getValue();
+					$s_thisErrorMsg = str_replace('===dateformat===',$s_thisVal,$rule->getValidationMessage());
+					
+					$a_formProps_custValidate[$elID][]=array('type'=>'date','fieldFormat'=>$s_thisVal,'errorMessage'=>$s_thisErrorMsg);
 					$a_fieldProps[$elID][] = 'FormItBuilder_customValidation';
 					//$a_fieldProps[$elID][] = 'isDate=^'.$rule->getValue().'^';
-					$a_fieldProps_jqValidate[$elID][] = 'date:true';
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextIsDate=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'digits:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps_jqValidate[$elID][] = 'dateFormat:\''.$s_thisVal.'\'';
+					//$a_fieldProps_errstringFormIt[$elID][] = 'vTextIsDate=`'.$s_thisErrorMsg.'`';
+					$a_fieldProps_errstringJq[$elID][] = 'dateFormat:"'.$s_thisErrorMsg.'"';
 					break;
 			}
 		}
@@ -333,7 +323,7 @@ class FormItBuilder extends FormItBuilderCore{
 					}
 					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
 					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <div class="errorContainer"><label class="error" for="'.htmlspecialchars($forId).'">[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
+						$s_form.=$nl.'  <div class="errorContainer"><label class="formiterror" for="'.htmlspecialchars($forId).'">[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
 					}
 					$s_form.=$nl.'  </div>';
 				$s_form.=$nl.'</div>'.$nl;
@@ -384,13 +374,48 @@ class FormItBuilder extends FormItBuilderCore{
 			$s_js='
 <script type="text/javascript">
 // <![CDATA[
+	
 $().ready(function() {
 
-//Remove existing error label and create own dynamically.
-$(".errorContainer .error").remove();
+jQuery.validator.addMethod("dateFormat", function(value, element, format) {
+	var b_retStatus=false;
+	var s_retValue="";
+	var n_retTimestamp=0;
+	if(value.length==format.length){
+		var separator_only = format;
+		separator_only = separator_only.replace(/m|d|y/g,"");
+		var separator = separator_only.charAt(0)
+
+		if(separator && separator_only.length==2){
+			var dayPos; var day; var monthPos; var month; var yearPos; var year;
+			var s_testYear;
+			var newStr = format;
+			
+			dayPos = format.indexOf("dd");
+			day = parseInt(value.substr(dayPos,2));
+			newStr=newStr.replace("dd",day);
+
+			monthPos = format.indexOf("mm");
+			month = parseInt(value.substr(monthPos,2));
+			newStr=newStr.replace("mm",month);
+
+			yearPos = format.indexOf("yyyy");
+			year = parseInt(value.substr(yearPos,4));
+			newStr=newStr.replace("yyyy",year);
+			
+			var testDate = new Date(year, month-1, day);
+			if (testDate.getDate()==day && (testDate.getMonth()+1)==month && testDate.getFullYear()==year) {
+				b_retStatus = true;
+				$(element).val(newStr);
+			}
+		} 
+	}
+	return this.optional(element) || b_retStatus;
+}, "Please enter a valid date.");
 
 //Main validate call
-$("#'.$this->_id.'").validate({errorPlacement:function(error, element) {
+var thisFormEl=$("#'.$this->_id.'");
+thisFormEl.validate({errorPlacement:function(error, element) {
 	var labelEl = element.parents(".formSegWrap").find(".errorContainer");
 	error.appendTo( labelEl );
 },success: function(element) {
@@ -413,8 +438,14 @@ $this->jqueryValidateJSON(
 	$a_formProps_jqValidate,
 	$a_formPropsJqErrorStrings
 ).'});
-
+	
+'.
+//Force validation on load if already posted
+($b_posted===true?'thisFormEl.valid();':'')
+.'
+	
 });
+
 // ]]>
 </script>
 ';

@@ -89,6 +89,11 @@ class FormRule extends FormItBuilderCore{
 				$element->setMinValue($value);
 				break;	
 			case FormRuleType::date:
+				/*
+				Supports any single character separator with any order of dd,mm and yyyy
+				Example: yyyy-dd-mm dd$$mm$yyyy dd/yyyy/mm.
+				Dates will be split and check if a real date is entered.
+				*/
 				$value=strtolower(trim($value));
 				if(empty($value)===true){
 					FormItBuilder::throwError('Date type field must have a value (date format) specified.');
