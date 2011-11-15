@@ -26,6 +26,8 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_emailTpl;
 	private $_validate;
 	private $_customValidators; 
+	private $_databaseTableObjectName;
+	private $_databaseTableFieldMapping;
 
 	/**
 	*
@@ -95,6 +97,10 @@ class FormItBuilder extends FormItBuilderCore{
 	public function setEmailTpl($v){$this->_emailTpl = $v;}
 	public function setValidate($v) { $this->_validate = $v; }
 	public function setCustomValidators($v) { $this->_customValidators = $v; }
+	public function setDatabaseObjectForInsert($s_objName,$a_mapping){
+		$this->_databaseTableObjectName=$s_objName;
+		$this->_databaseTableFieldMapping=$a_mapping;
+	}
     
 	public function addElement(FormItBuilder_element $o_formElement){
 		$this->_formElements[]=$o_formElement;
@@ -102,6 +108,53 @@ class FormItBuilder extends FormItBuilderCore{
 	public function addElements($a_elements){
 		foreach($a_elements as $o_formElement){
 			$this->addElement($o_formElement);
+		}
+	}
+	
+	private function addToDatabase($s_ObjName,$a_mapping){
+		//inspired by http://bobsguides.com/custom-db-tables.html
+		$fields = array();
+		foreach($a_mapping as $a){
+			$o_formObj = $a[0];
+			$s_keyName = $a[1];
+			
+			$fields[$s_keyName]=$_POST[$o_formObj->getId()];
+		};
+		$newObj = $this->modx->newObject($s_ObjName, $fields);
+		$res = $newObj->save();
+		if($res===true){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public function processHooks($a_hookCommands){
+		//called from the FormItBuilder_hooks snippet. Not intended to be called publically in any other way.
+		$i_okCount=0;
+		foreach($a_hookCommands as $a_cmd){
+			$b_res=false;
+			if(isset($a_cmd['name'],$a_cmd['value'])===true){
+				switch($a_cmd['name']){
+					case 'dbEntry':
+						if(isset($a_cmd['value']['tableObj'],$a_cmd['value']['mapping'])===true){
+							$b_res = $this->addToDatabase($a_cmd['value']['tableObj'],$a_cmd['value']['mapping']);
+						}else{
+							FormItBuilder::throwError('FormItBuilder processHooks failed. The tableObj or mapping attributes were not set for "'.$a_cmd['name'].'".');		
+						}
+						break;
+				}
+				if($b_res===true){
+					$i_okCount++;
+				}
+			}else{
+				FormItBuilder::throwError('FormItBuilder processHooks failed. The name and value pair is not set.');
+			}
+		}
+		if($i_okCount==count($a_hookCommands)){
+			return true;
+		}else{
+			return false;
 		}
 	}
 	
@@ -357,6 +410,19 @@ class FormItBuilder extends FormItBuilderCore{
 				$a_formItErrorMessage[]=$a_formPropsFormItErrorStrings[$i];
 			}
 		}
+		
+		//if using database table then add call to final hook
+		$b_addFinalHooks=false;
+		$GLOBALS['FormItBuilder_hookCommands']=array('formObj'=>&$this,'commands'=>array());
+		if(empty($this->_databaseTableObjectName)===false){
+			$GLOBALS['FormItBuilder_hookCommands']['commands'][]=array('name'=>'dbEntry','value'=>array('tableObj'=>$this->_databaseTableObjectName,'mapping'=>$this->_databaseTableFieldMapping));
+			$b_addFinalHooks=true;
+		}
+		if($b_addFinalHooks===true){
+			$this->_hooks[]='FormItBuilder_hooks';
+		}
+		
+		
 		$s_formItCmd='[[!FormIt?'
 		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?','.implode(',',$this->_hooks):'').'`'
 		.$nl.'&emailTpl=`'.$this->_emailTpl.'`'
