@@ -28,6 +28,15 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_customValidators; 
 	private $_databaseTableObjectName;
 	private $_databaseTableFieldMapping;
+	
+	private $_emailFromName;
+	private $_emailToName;
+	private $_emailReplyToAddress;
+	private $_emailReplyToName;
+	private $_emailCCAddress;
+	private $_emailCCName;
+	private $_emailBCCAddress;
+	private $_emailBCCName;
 
 	/**
 	*
@@ -68,8 +77,6 @@ class FormItBuilder extends FormItBuilderCore{
 		}
 	}
 	
-
-	
 	//getters & setters
 	public function getMethod() { return $this->_method; } 
 	public function getId() { return $this->_id; } 
@@ -84,6 +91,14 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getEmailTpl() { return $this->_emailTpl; }
 	public function getValidate() { return $this->_validate; }
 	public function getCustomValidators() { return $this->_customValidators; }
+	public function getEmailFromName() { return $this->_emailFromName; }
+	public function getEmailToName() { return $this->_emailToName; }
+	public function getEmailReplyToAddress() { return $this->_emailReplyToAddress; }
+	public function getEmailReplyToName() { return $this->_emailReplyToName; }
+	public function getEmailCCAddress() { return $this->_emailCCAddress; }
+	public function getEmailCCName() { return $this->_emailCCName; }
+	public function getEmailBCCAddress() { return $this->_emailBCCAddress; }
+	public function getEmailBCCName() { return $this->_emailBCCName; }
 	
 	public function setMethod($v) { $this->_method = $v; } 
 	public function setRedirectDocument($v) { $this->_redirectDocument = $v; } 
@@ -91,6 +106,14 @@ class FormItBuilder extends FormItBuilderCore{
 	public function setPostHookName($v) { $this->_postHookName = $v; }
 	public function setEmailFromAddress($v) { $this->_emailFromAddress = $v; }
 	public function setEmailToAddress($v) { $this->_emailToAddress = $v; }
+	public function setEmailFromName($v) { $this->_emailFromName = $v; }
+	public function setEmailToName($v) { $this->_emailToName = $v; }
+	public function setEmailReplyToAddress($v) { $this->_emailReplyToAddress = $v; }
+	public function setEmailReplyToName($v) { $this->_emailReplyToName = $v; }
+	public function setEmailCCAddress($v) { $this->_emailCCAddress = $v; }
+	public function setEmailCCName($v) { $this->_emailCCName = $v; }
+	public function setEmailBCCAddress($v) { $this->_emailBCCAddress = $v; }
+	public function setEmailBCCName($v) { $this->_emailBCCName = $v; }
 	public function setEmailSubject($v) { $this->_emailSubject = $v; }
 	public function setEmailHeadHtml($v) { $this->_emailHeadHtml = $v; }
 	public function setHooks($v){$this->_hooks = self::forceArray($v);}
@@ -425,15 +448,30 @@ class FormItBuilder extends FormItBuilderCore{
 		
 		$s_formItCmd='[[!FormIt?'
 		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?','.implode(',',$this->_hooks):'').'`'
-		.$nl.'&emailTpl=`'.$this->_emailTpl.'`'
-		.(isset($this->_emailToAddress)?$nl.'&emailTo=`'.$this->_emailToAddress.'`':'')
-		.(isset($this->_emailFromAddress)?$nl.'&emailFrom=`'.$this->_emailFromAddress.'`':'')
+		.(empty($this->_emailTpl)===false?$nl.'&emailTpl=`'.$this->_emailTpl.'`':'')
+			
+		.(empty($this->_emailToAddress)===false?$nl.'&emailTo=`'.$this->_emailToAddress.'`':'')
+		.(empty($this->_emailToName)===false?$nl.'&emailToName=`'.$this->_emailToName.'`':'')
+			
+		.(empty($this->_emailFromAddress)===false?$nl.'&emailFrom=`'.$this->_emailFromAddress.'`':'')
+		.(empty($this->_emailFromName)===false?$nl.'&emailFromName=`'.$this->_emailFromName.'`':'')
+			
+		.(empty($this->_emailReplyToAddress)===false?$nl.'&emailReplyTo=`'.$this->_emailReplyToAddress.'`':'')
+		.(empty($this->_emailReplyToName)===false?$nl.'&emailReplyToName=`'.$this->_emailReplyToName.'`':'')
+		
+		.(empty($this->_emailCCAddress)===false?$nl.'&emailCC=`'.$this->_emailCCAddress.'`':'')
+		.(empty($this->_emailCCName)===false?$nl.'&emailCCName=`'.$this->_emailCCName.'`':'')
+			
+		.(empty($this->_emailBCCAddress)===false?$nl.'&emailBCC=`'.$this->_emailBCCAddress.'`':'')
+		.(empty($this->_emailBCCName)===false?$nl.'&emailBCCName=`'.$this->_emailBCCName.'`':'')
+			
+		.(empty($this->_customValidators)===false?$nl.'&customValidators=`'.$this->_customValidators.'`':'')
+			
 		.$nl.'&emailSubject=`'.$this->_emailSubject.'`'
 		.$nl.'&emailUseFieldForSubject=`1`'
 		.$nl.'&redirectTo=`'.$this->_redirectDocument.'`'
 		.$nl.'&submitVar=`'.$s_submitVar.'`'
 		.$nl.implode($nl,$a_formItErrorMessage)
-        .(!empty($this->_customValidators)?$nl.'&customValidators=`'.$this->_customValidators.'`':'')
 		.$nl.'&validate=`'.(isset($this->_validate)?$this->_validate.',':'').implode(','.$nl.' ',$a_formItCmds).','.$nl.'`]]'.$nl;
 		
 		if($this->_jqueryValidation===true){
