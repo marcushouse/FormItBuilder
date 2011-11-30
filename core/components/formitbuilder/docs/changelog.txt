@@ -1,9 +1,15 @@
 Changelog for FormItBuilder.
 
+FormItBuilder 0.1.9-beta
+====================================
+- Added captcha support
+- Fixed bug in non-required date fields (if date field was not required and empty an error message would be thrown).
+
 FormItBuilder 0.1.8-beta
 ====================================
+- Added emailFromName, emailToName, emailReplyToAddress, emailReplyToName, emailCCAddress, emailCCName, emailBCCAddress, emailBCCName
 - Added ability to alter dynamic emailTpl
-- Added file support*
+- Added file upload support*
 - Added customValidators (see customValidators property for formIt)*
 - Added validate (to allow extra validate options to be set)*
 * Thanks for the assistance Adam!

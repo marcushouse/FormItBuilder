@@ -11,6 +11,7 @@ function FormItBuilder_MyContactForm(modX &$modx, string $snippetName) {
 //Text Fields
 $o_fe_name			= new FormItBuilder_elementText('name_full','Full Name');
 $o_fe_age			= new FormItBuilder_elementText('age','Age');
+$o_fe_dob			= new FormItBuilder_elementText('date_of_birth','Date of Birth');
 $o_fe_username		= new FormItBuilder_elementText('username','Username');
 $o_fe_userPass		= new FormItBuilder_elementPassword('user_pass','Password');
 $o_fe_userPass2		= new FormItBuilder_elementPassword('user_pass2','Confirm Password');
@@ -70,7 +71,7 @@ $o_fe_buttReset		= new FormItBuilder_elementButton('reset','Reset Form','reset')
 /*--------------------*/
 $a_formRules=array();
 //Set required fields
-$a_formFields_required = array($o_fe_notes, $o_fe_name, $o_fe_age, $o_fe_username, $o_fe_userPass, $o_fe_userPass2, $o_fe_email, $o_fe_postcode);
+$a_formFields_required = array($o_fe_notes, $o_fe_name, $o_fe_age, $o_fe_dob, $o_fe_username, $o_fe_userPass, $o_fe_userPass2, $o_fe_email, $o_fe_postcode);
 foreach($a_formFields_required as $field){
 	$a_formRules[] = new FormRule(FormRuleType::required,$field);
 }
@@ -85,6 +86,7 @@ $a_formRules[] = new FormRule(FormRuleType::minimumLength, $o_fe_username, 6);
 $a_formRules[] = new FormRule(FormRuleType::maximumLength, $o_fe_username, 30);
 $a_formRules[] = new FormRule(FormRuleType::minimumValue, $o_fe_age, 18);
 $a_formRules[] = new FormRule(FormRuleType::maximumValue, $o_fe_age, 100);
+$a_formRules[] = new FormRule(FormRuleType::date, $o_fe_dob, 'dd/mm/yyyy');
 //A unique case, when checking if passwords match pass the two fields as an array into the second argument.
 $a_formRules[] = new FormRule(FormRuleType::fieldMatch, array($o_fe_userPass2,$o_fe_userPass), NULL, 'Passwords do not match');
 
@@ -96,8 +98,13 @@ $o_form->setHooks(array('spam','email','redirect'));
 $o_form->setRedirectDocument(1); //document to redirect to after successfull submission
 $o_form->addRules($a_formRules);
 $o_form->setPostHookName($snippetName);
-$o_form->setEmailToAddress('youraddress@domain.com');
+
+//specify to anf from email addresses, also see replyTo, CC and BCC options
+$o_form->setEmailToAddress('toaddress@domain.com');
+$o_form->setEmailToName('To Name');
 $o_form->setEmailFromAddress('[[+email_address]]');
+$o_form->setEmailFromName('From Name');
+
 $o_form->setEmailSubject('MyCompany Contact Form Submission - From: [[+name_full]]');
 $o_form->setEmailHeadHtml('<p>This is a response sent by [[+name_full]] using the contact us form:</p>');
 $o_form->setJqueryValidation(true);
@@ -106,7 +113,7 @@ $o_form->setJqueryValidation(true);
 $o_form->addElements(
 	array(
 		new FormItBuilder_htmlBlock('<h2>Personal Information</h2>'),
-		$o_fe_name,	$o_fe_age,	$o_fe_username,	$o_fe_userPass,	$o_fe_userPass2, $o_fe_email,
+		$o_fe_name,	$o_fe_age,	$o_fe_dob, $o_fe_username,	$o_fe_userPass,	$o_fe_userPass2, $o_fe_email,
 		new FormItBuilder_htmlBlock('<hr class="formSpltter" /><h2>Address</h2>'),
 		$o_fe_address,	$o_fe_city,	$o_fe_usstates, $o_fe_postcode,
 		new FormItBuilder_htmlBlock('<hr class="formSpltter" /><h2>Company Information</h2>'),

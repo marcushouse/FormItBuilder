@@ -65,6 +65,17 @@ abstract class FormItBuilder_element extends FormItBuilderCore{
 		}
 	}
 }
+class FormItBuilder_elementReCaptcha extends FormItBuilder_element{
+	function __construct(string $label) {
+		parent::__construct('recaptcha',$label);
+	}
+	public function outputHTML(){
+		$s_ret='[[+formit.recaptcha_html]]';
+		return $s_ret;
+	}
+}
+
+
 class FormItBuilder_elementSelect extends FormItBuilder_element{
 	private $_values;
 	private $_defaultVal;
