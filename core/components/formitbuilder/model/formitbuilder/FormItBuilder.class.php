@@ -28,6 +28,8 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_customValidators; 
 	private $_databaseTableObjectName;
 	private $_databaseTableFieldMapping;
+	private $_store;
+	private $_placeholderJavascript;
 	
 	private $_emailFromName;
 	private $_emailToName;
@@ -47,6 +49,7 @@ class FormItBuilder extends FormItBuilderCore{
 	    $this->modx = &$modx;
 		$this->_method = 'post'; 
 		$this->_id = $id;
+		$this->_store = 1;
 		$this->_formElements=array();
 		$this->_rules=array();
 		$this->_redirectDocument=$this->modx->resource->get('id');
@@ -99,6 +102,8 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getEmailCCName() { return $this->_emailCCName; }
 	public function getEmailBCCAddress() { return $this->_emailBCCAddress; }
 	public function getEmailBCCName() { return $this->_emailBCCName; }
+	public function getStore() { return $this->_store; }
+	public function getPlaceholderJavascript() { return $this->_placeholderJavascript; } 
 	
 	public function setMethod($v) { $this->_method = $v; } 
 	public function setRedirectDocument($v) { $this->_redirectDocument = $v; } 
@@ -124,6 +129,8 @@ class FormItBuilder extends FormItBuilderCore{
 		$this->_databaseTableObjectName=$s_objName;
 		$this->_databaseTableFieldMapping=$a_mapping;
 	}
+	public function setStore($v) { $this->_store = $v; }
+	public function setPlaceholderJavascript($v) { $this->_placeholderJavascript = $v; }
     
 	public function addElement(FormItBuilder_element $o_formElement){
 		$this->_formElements[]=$o_formElement;
@@ -470,15 +477,13 @@ class FormItBuilder extends FormItBuilderCore{
 		.$nl.'&emailSubject=`'.$this->_emailSubject.'`'
 		.$nl.'&emailUseFieldForSubject=`1`'
 		.$nl.'&redirectTo=`'.$this->_redirectDocument.'`'
+		.$nl.'&store=`'.$this->_store.'`'
 		.$nl.'&submitVar=`'.$s_submitVar.'`'
 		.$nl.implode($nl,$a_formItErrorMessage)
 		.$nl.'&validate=`'.(isset($this->_validate)?$this->_validate.',':'').implode(','.$nl.' ',$a_formItCmds).','.$nl.'`]]'.$nl;
 		
 		if($this->_jqueryValidation===true){
-			$s_js='
-<script type="text/javascript">
-// <![CDATA[
-	
+			$s_js='	
 $().ready(function() {
 
 jQuery.validator.addMethod("dateFormat", function(value, element, format) {
@@ -549,12 +554,21 @@ $this->jqueryValidateJSON(
 .'
 	
 });
-
-// ]]>
-</script>
 ';
 		}
-		return $s_formItCmd.$s_form.$s_js;
+		
+		//Allows output of the javascript into a paceholder so in can be inserted elsewhere in html (head etc)
+		if(empty($this->_placeholderJavascript)===false){
+			$this->modx->setPlaceholder($this->_placeholderJavascript,$s_js);
+			return $s_formItCmd.$s_form;
+		}else{
+			return $s_formItCmd.$s_form.
+'<script type="text/javascript">
+// <![CDATA[
+'.$s_js.'
+// ]]>
+</script>';
+		}
 	}
 
 	public function output(){

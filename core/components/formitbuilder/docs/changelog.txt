@@ -2,8 +2,11 @@ Changelog for FormItBuilder.
 
 FormItBuilder 0.1.9-beta
 ====================================
+- Added ability to output javascript into a placeholder with the setPlaceholderJavascript method.
+- Added "store" FormIt config option.
 - Added captcha support
 - Fixed bug in non-required date fields (if date field was not required and empty an error message would be thrown).
+- Fix some class orders that were having issues with some PHP installs.
 
 FormItBuilder 0.1.8-beta
 ====================================

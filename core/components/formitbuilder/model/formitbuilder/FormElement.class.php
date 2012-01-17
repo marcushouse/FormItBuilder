@@ -68,6 +68,7 @@ abstract class FormItBuilder_element extends FormItBuilderCore{
 class FormItBuilder_elementReCaptcha extends FormItBuilder_element{
 	function __construct(string $label) {
 		parent::__construct('recaptcha',$label);
+		$this->_showInEmail=false;
 	}
 	public function outputHTML(){
 		$s_ret='[[+formit.recaptcha_html]]';
