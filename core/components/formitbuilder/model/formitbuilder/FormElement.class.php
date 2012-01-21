@@ -231,7 +231,7 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 		if(isset($_POST[$this->_id])===true){
 			$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).']]';
 		}else{
-			$selectedStr=$this->_defaultVal;
+			$selectedStr=htmlspecialchars($this->_defaultVal);
 		}
 		if($this->_required===true){
 			$a_classes[]='required'; // for jquery validate (or for custom CSSing :) )
@@ -303,22 +303,20 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	protected $_maxValue;
 	protected $_minValue;
 	protected $_dateFormat;
+	protected $_defaultVal;
+	
 	/*
 	protected $_isNumeric;
 	protected $_isEmail;
 	 */
 
-	function __construct( string $id, string $label ) {
+	function __construct( string $id, string $label, string $defaultValue=NULL ) {
 		parent::__construct($id,$label);
+		$this->_defaultVal = $defaultValue;
 		$this->_maxLength=NULL;
 		$this->_minLength=NULL;
 		$this->_maxValue=NULL;
 		$this->_minValue=NULL;
-		
-		/*
-		$this->_isNumeric=false;
-		$this->_isEmail=false;
-		*/
 		$this->_fieldType='text';
 	}
 	
@@ -396,7 +394,15 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	
 	public function outputHTML(){
 		$a_classes=array();
-		$s_ret='<input type="'.$this->_fieldType.'" name="'.htmlspecialchars($this->_id).'" id="'.htmlspecialchars($this->_id).'" value="[[+fi.'.htmlspecialchars($this->_id).']]"';
+		
+		//hidden field with same name is so we get a post value regardless of tick status
+		if(isset($_POST[$this->_id])===true){
+			$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).']]';
+		}else{
+			$selectedStr=htmlspecialchars($this->_defaultVal);
+		}
+		
+		$s_ret='<input type="'.$this->_fieldType.'" name="'.htmlspecialchars($this->_id).'" id="'.htmlspecialchars($this->_id).'" value="'.$selectedStr.'"';
 		if($this->_maxLength!==NULL){
 			$s_ret.=' maxlength="'.htmlspecialchars($this->_maxLength).'"';
 		}
@@ -412,8 +418,8 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	}
 }
 class FormItBuilder_elementPassword extends FormItBuilder_elementText{
-	function __construct( string $id, string $label ) {
-		parent::__construct($id,$label);
+	function __construct( string $id, string $label, string $defaultValue=NULL ) {
+		parent::__construct($id,$label,$defaultValue);
 		$this->_fieldType='password';
 	}
 }

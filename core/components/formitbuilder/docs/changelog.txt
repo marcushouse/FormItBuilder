@@ -1,7 +1,11 @@
 Changelog for FormItBuilder.
 
-FormItBuilder 0.1.9-beta
+FormItBuilder 0.1.9-rc1
 ====================================
+- Added element type class to element wrappers (for extra CSS flexibility)
+- Add title attributes
+- Added default value for text field.
+- Fix single digit date issues with date field
 - Added ability to output javascript into a placeholder with the setPlaceholderJavascript method.
 - Added "store" FormIt config option.
 - Added captcha support

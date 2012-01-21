@@ -16,6 +16,7 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_formElements;
 	private $_postHookName;
 	private $_headHtml;
+	private $_formTitle;
 	private $_emailFromAddress;
 	private $_emailSubject;
 	private $_emailToAddress;
@@ -47,6 +48,7 @@ class FormItBuilder extends FormItBuilderCore{
 	*/
 	function __construct(modX &$modx, string $id) {
 	    $this->modx = &$modx;
+		$this->_formTitle='Created by FormItBuilder';
 		$this->_method = 'post'; 
 		$this->_id = $id;
 		$this->_store = 1;
@@ -104,6 +106,7 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getEmailBCCName() { return $this->_emailBCCName; }
 	public function getStore() { return $this->_store; }
 	public function getPlaceholderJavascript() { return $this->_placeholderJavascript; } 
+	public function getFormTitle() { return $this->_formTitle; } 
 	
 	public function setMethod($v) { $this->_method = $v; } 
 	public function setRedirectDocument($v) { $this->_redirectDocument = $v; } 
@@ -131,6 +134,7 @@ class FormItBuilder extends FormItBuilderCore{
 	}
 	public function setStore($v) { $this->_store = $v; }
 	public function setPlaceholderJavascript($v) { $this->_placeholderJavascript = $v; }
+	public function setFormTitle($v) { $this->_formTitle = $v; }
     
 	public function addElement(FormItBuilder_element $o_formElement){
 		$this->_formElements[]=$o_formElement;
@@ -394,12 +398,13 @@ class FormItBuilder extends FormItBuilderCore{
 			if(is_a($o_el,'FormItBuilder_htmlBlock')){
 				$s_form.=$o_el->outputHTML();
 			}else{
+				$s_typeClass = substr($s_elClass,14,strlen($s_elClass)-14);
 				$forId=$o_el->getId();
 				if(is_a($o_el,'FormItBuilder_elementRadioGroup')===true){
 					$forId=$o_el->getId().'_0';
 				}
-				
-				$s_form.='<div class="formSegWrap formSegWrap_'.htmlspecialchars($o_el->getId()).'">';
+				$b_required = $o_el->isRequired();
+				$s_form.='<div title="'.$o_el->getLabel().'" class="formSegWrap formSegWrap_'.htmlspecialchars($o_el->getId()).' '.$s_typeClass.($b_required===true?' required':'').'">';
 					if($o_el->showLabel()===true){
 
 						$s_form.=$nl.'  <label class="mainElLabel" for="'.htmlspecialchars($forId).'">'.$o_el->getLabel().'</label>';
@@ -415,7 +420,11 @@ class FormItBuilder extends FormItBuilderCore{
 		$s_form.=$nl.'</div>';
 
 		//wrap form elements in form tags
-		$s_form='<form action="[[~[[*id]]]]" method="'.htmlspecialchars($this->_method).'"'.($b_attachmentIncluded?' enctype="multipart/form-data"':'').' class="form" id="'.htmlspecialchars($this->_id).'">'.$nl
+		$s_formTitle='';
+		if(empty($this->_formTitle)===false){
+			$s_formTitle = ' title="'.$this->_formTitle.'"';
+		}
+		$s_form='<form action="[[~[[*id]]]]"'.$s_formTitle.' method="'.htmlspecialchars($this->_method).'"'.($b_attachmentIncluded?' enctype="multipart/form-data"':'').' class="form" id="'.htmlspecialchars($this->_id).'">'.$nl
 		.$s_form.$nl
 		.'</form>';
 		
@@ -502,10 +511,12 @@ jQuery.validator.addMethod("dateFormat", function(value, element, format) {
 			
 			dayPos = format.indexOf("dd");
 			day = parseInt(value.substr(dayPos,2));
+			if(day.length()==1){day="0"+month;}
 			newStr=newStr.replace("dd",day);
 
 			monthPos = format.indexOf("mm");
 			month = parseInt(value.substr(monthPos,2));
+			if(month.length()==1){month="0"+month;}
 			newStr=newStr.replace("mm",month);
 
 			yearPos = format.indexOf("yyyy");
