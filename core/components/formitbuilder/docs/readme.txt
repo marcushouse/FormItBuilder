@@ -1,8 +1,8 @@
 ----------------------
 Snippet: FormItBuilder
 ----------------------
-Version: 0.1.9 rc1
-Created: January 19, 2012
+Version: 0.1.9 rc2
+Created: January 24, 2012
 Author: Marcus House
 
 A small framework to assist in quick development of FormIt forms and emails. Using a snippet (with some basic PHP commands) a complex form can be built much faster, and can automatically use the jQuery plugin "Validation" methods
