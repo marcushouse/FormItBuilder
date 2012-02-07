@@ -512,13 +512,13 @@ jQuery.validator.addMethod("dateFormat", function(value, element, format) {
 			var newStr = format;
 			
 			dayPos = format.indexOf("dd");
-			day = parseInt(value.substr(dayPos,2));
-			if(day.length()==1){day="0"+month;}
+			day = parseInt(value.substr(dayPos,2))+"";
+			if(day.length==1){day="0"+day;}
 			newStr=newStr.replace("dd",day);
 
 			monthPos = format.indexOf("mm");
-			month = parseInt(value.substr(monthPos,2));
-			if(month.length()==1){month="0"+month;}
+			month = parseInt(value.substr(monthPos,2))+"";
+			if(month.length==1){month="0"+month;}
 			newStr=newStr.replace("mm",month);
 
 			yearPos = format.indexOf("yyyy");
@@ -526,7 +526,14 @@ jQuery.validator.addMethod("dateFormat", function(value, element, format) {
 			newStr=newStr.replace("yyyy",year);
 			
 			var testDate = new Date(year, month-1, day);
-			if (testDate.getDate()==day && (testDate.getMonth()+1)==month && testDate.getFullYear()==year) {
+			
+			var testDateDay=(testDate.getDate())+"";
+			if(testDateDay.length==1){testDateDay="0"+testDateDay;}
+			
+			var testDateMonth=(testDate.getMonth()+1)+"";
+			if(testDateMonth.length==1){testDateMonth="0"+testDateMonth;}
+			
+			if (testDateDay==day && testDateMonth==month && testDate.getFullYear()==year) {
 				b_retStatus = true;
 				$(element).val(newStr);
 			}
