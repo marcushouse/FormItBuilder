@@ -1,6 +1,8 @@
 <?php
 require_once 'FormItBuilderCore.class.php';
-
+/**
+ * The main FormItBuilder methods. Most of the program bulk lives within this class and handles a great number of set/get methods and output methods.
+ */
 class FormItBuilder extends FormItBuilderCore{
 	/**
 	 * A reference to the modX instance
@@ -46,7 +48,7 @@ class FormItBuilder extends FormItBuilderCore{
 	* @param modX $modx Reference to the core modX object
 	* @param string $id Id of the form
 	*/
-	function __construct(modX &$modx, string $id) {
+	function __construct(modX &$modx, $id) {
 	    $this->modx = &$modx;
 		$this->_formTitle='Created by FormItBuilder';
 		$this->_method = 'post'; 
@@ -136,7 +138,7 @@ class FormItBuilder extends FormItBuilderCore{
 	public function setPlaceholderJavascript($v) { $this->_placeholderJavascript = $v; }
 	public function setFormTitle($v) { $this->_formTitle = $v; }
     
-	public function addElement(FormItBuilder_element $o_formElement){
+	public function addElement(FormItBuilder_baseElement $o_formElement){
 		$this->_formElements[]=$o_formElement;
 	}
 	public function addElements($a_elements){

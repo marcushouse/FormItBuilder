@@ -1,6 +1,8 @@
 <?php
 require_once 'FormRuleType.class.php';
-
+/**
+ * Contains rule methods applied to an element. The FormItBuilder object is then assigned rules using the addRules method.
+ */
 class FormRule extends FormItBuilderCore{
 	private $_type;
 	private $_element;
@@ -19,7 +21,7 @@ class FormRule extends FormItBuilderCore{
 	 * @param string $type Recommend using FormRule constant to determine rule types
 	 * @param mixed $elements A single form element or an array of form elements
 	 */
-	function __construct( string $type, mixed $element, mixed $value=NULL, string $validationMessage=NULL ) {
+	function __construct($type, $element, $value=NULL, $validationMessage=NULL ) {
 		//verify we have a single form element or an array of them
 		if(is_array($element)===false){
 			FormItBuilder::verifyFormElement($element);

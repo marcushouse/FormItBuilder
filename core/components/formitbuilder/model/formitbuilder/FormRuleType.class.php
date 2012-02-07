@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * A simple class to define strings as constants for rule types to make them more easily read.
+ */
 class FormRuleType extends FormItBuilderCore{
 	const fieldMatch = 'fieldMath';
 	const required = 'required';

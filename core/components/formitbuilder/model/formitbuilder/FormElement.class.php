@@ -1,16 +1,35 @@
 <?php
 require_once 'FormItBuilderCore.class.php';
 
-class FormItBuilder_htmlBlock extends FormItBuilderCore{
+/**
+ * A primitive form element used as a base to extend into a variety of elements
+ */
+class FormItBuilder_baseElement extends FormItBuilderCore{
+}
+
+/**
+ * A primitive form element used only to inject raw html and place between other elements.
+ */
+class FormItBuilder_htmlBlock extends FormItBuilder_baseElement{
 	private $_html;
-	function __construct( string $html ) {		
+	/**
+	 * The html to use as the element.
+	 * @param string $html 
+	 */
+	function __construct( $html ) {		
 		$this->_html=$html;
 	}
+	
+	/**
+	 * output function called when generating the form elements content.
+	 * @return type 
+	 */
 	public function outputHTML(){
 		return $this->_html;
 	}
 }
-abstract class FormItBuilder_element extends FormItBuilderCore{
+
+abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	
 	protected $_id;
 	protected $_label;
@@ -19,7 +38,10 @@ abstract class FormItBuilder_element extends FormItBuilderCore{
 	protected $_required;
 	protected $_showInEmail;
 
-	//Must include function to contsruct the html
+	/**
+	 * output function called when generating the form elements content.
+	 * @return type 
+	 */
 	abstract protected function outputHTML();
 	
 	/**
@@ -28,7 +50,7 @@ abstract class FormItBuilder_element extends FormItBuilderCore{
 	 * @param modX &$modx A reference to the modX instance.
 	 * @param array $config An array of configuration options. Optional.
 	 */
-	function __construct( string $id, string $label ) {		
+	function __construct( $id, $label ) {		
 		$this->_required = false;
 		$this->_id = $id;
 		$this->_label = $label;
@@ -43,21 +65,21 @@ abstract class FormItBuilder_element extends FormItBuilderCore{
 	public function setLabel($v) { $this->_label = $v; }
         
 	//single getter setter methods
-	public function showLabel($v){
+	public function showLabel($v=null){
 		if(func_num_args() == 0) {
 			return $this->_showLabel;
 		}else{
 			$this->_showLabel = FormItBuilder::forceBool(func_get_arg(0));
 		}
 	}
-	public function isRequired($v){
+	public function isRequired($v=null){
 		if(func_num_args() == 0) {
 			return $this->_required;
 		}else{
 			$this->_required = FormItBuilder::forceBool(func_get_arg(0));
 		}
 	}
-	public function showInEmail($v){
+	public function showInEmail($v=null){
 		if(func_num_args() == 0) {
 			return $this->_showInEmail;
 		}else{
@@ -66,7 +88,7 @@ abstract class FormItBuilder_element extends FormItBuilderCore{
 	}
 }
 class FormItBuilder_elementReCaptcha extends FormItBuilder_element{
-	function __construct(string $label) {
+	function __construct($label) {
 		parent::__construct('recaptcha',$label);
 		$this->_showInEmail=false;
 	}
@@ -87,7 +109,7 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 	 * @param string $label Label of the select element
 	 * @param array $values Array of title/value arrays in order of display.
 	 */
-	function __construct(string $id, string $label, array $values, string $defaultValue) {
+	function __construct($id, $label, array $values, $defaultValue=null) {
 		parent::__construct($id,$label);
 		$this->_values = $values;
 		$this->_defaultVal = $defaultValue;
@@ -127,7 +149,7 @@ class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
 	 * @param string $label Label of the select element
 	 * @param array $values Array of title/value arrays in order of display.
 	 */
-	function __construct(string $id, string $label, array $values, string $defaultValue) {
+	function __construct($id, $label, array $values, $defaultValue=null) {
 		parent::__construct($id,$label);
 		$this->_values = $values;
 		$this->_showIndividualLabels = true;
@@ -179,7 +201,7 @@ class FormItBuilder_elementButton extends FormItBuilder_element{
 	 * @param string $buttonLabel Label of the button
 	 * @param string $type Type of button, e.g button, submit, reset etc.
 	 */
-	function __construct( string $id, string $buttonLabel, string $type ) {
+	function __construct($id, $buttonLabel, $type ) {
 		parent::__construct($id,$buttonLabel);
 		$this->_showLabel = false;
 		$this->_showInEmail = false;
@@ -219,7 +241,7 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 	 * @param int $cols The required cols attribute value that must be set on a valid XHTML textarea tag.
 	 * @param string $defaultValue Default text to appear in text area.
 	 */
-	function __construct( string $id, string $label, int $rows, int $cols, string $defaultValue=NULL) {
+	function __construct($id, $label, $rows, $cols, $defaultValue=NULL) {
 		parent::__construct($id,$label);
 		$this->_defaultVal = $defaultValue;
 		$this->_rows = FormItBuilderCore::forceNumber($rows);
@@ -260,7 +282,7 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 	 * @param string $value Value of checkbox
 	 * @param boolean $checked Set as ticked by default
 	 */
-	function __construct( string $id, string $label, string $value=NULL, string $uncheckedValue=NULL, boolean $checked=NULL) {
+	function __construct( $id, $label, $value=NULL, $uncheckedValue=NULL, $checked=NULL) {
 		parent::__construct($id,$label);
 		
 		if($value===NULL){
@@ -310,7 +332,7 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	protected $_isEmail;
 	 */
 
-	function __construct( string $id, string $label, string $defaultValue=NULL ) {
+	function __construct( $id, $label, $defaultValue=NULL ) {
 		parent::__construct($id,$label);
 		$this->_defaultVal = $defaultValue;
 		$this->_maxLength=NULL;
@@ -376,14 +398,14 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	
 	
 	/*
-	public function isEmail($v){
+	public function isEmail($v=null){
 		if(func_num_args() == 0) {
 			return $this->_isEmail;
 		}else{
 			$this->_isEmail = FormItBuilder::forceBool(func_get_arg(0));
 		}
 	}
-	public function isNumeric($v){
+	public function isNumeric($v=null){
 		if(func_num_args() == 0) {
 			return $this->_isNumeric;
 		}else{
@@ -418,13 +440,13 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	}
 }
 class FormItBuilder_elementPassword extends FormItBuilder_elementText{
-	function __construct( string $id, string $label, string $defaultValue=NULL ) {
+	function __construct( $id, $label, $defaultValue=NULL ) {
 		parent::__construct($id,$label,$defaultValue);
 		$this->_fieldType='password';
 	}
 }
 class FormItBuilder_elementFile extends FormItBuilder_elementText{
-	function __construct( string $id, string $label ) {
+	function __construct( $id, $label ) {
 		parent::__construct($id,$label);
 		$this->_fieldType='file';
 	}

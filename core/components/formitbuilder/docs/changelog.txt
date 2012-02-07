@@ -1,5 +1,9 @@
 Changelog for FormItBuilder.
 
+FormItBuilder 0.1.9-rc3
+====================================
+- Fixed a great number of trivial PHP errors in the ModX error log (Thanks for the report Alex)
+
 FormItBuilder 0.1.9-rc2
 ====================================
 - Added element type class to element wrappers (for extra CSS flexibility)
