@@ -56,7 +56,7 @@ class FormRule extends FormItBuilderCore{
 				break;
 			case FormRuleType::required:
 				if($validationMessage===NULL){
-					 $this->_validationMessage = $element->getLabel().' is required';
+					$this->_validationMessage = $element->getLabel().' is required'; 
 				}
 				$element->isRequired(true);
 				break;
@@ -65,8 +65,14 @@ class FormRule extends FormItBuilderCore{
 			case FormRuleType::maximumLength:
 				$value = FormItBuilder::forceNumber($value);
 				if($validationMessage===NULL){
-					$this->_validationMessage = $element->getLabel().' must only contain '.$value.' characters';
+					
 				}
+				if(is_a($element, 'FormItBuilder_elementCheckboxGroup')){
+					$this->_validationMessage = $element->getLabel().' must have less than '.($value+1).' selected';
+				}else{
+					$this->_validationMessage = $element->getLabel().' can only contain up to '.$value.' characters';
+				}
+					
 				$element->setMaxLength($value);
 				break;
 			case FormRuleType::maximumValue:
@@ -79,7 +85,11 @@ class FormRule extends FormItBuilderCore{
 			case FormRuleType::minimumLength:
 				$value = FormItBuilder::forceNumber($value);
 				if($validationMessage===NULL){
-					$this->_validationMessage = $element->getLabel().' must be at least '.$value.' characters';
+					if(is_a($element, 'FormItBuilder_elementCheckboxGroup')){
+						$this->_validationMessage = $element->getLabel().' must have at least '.$value.' selected';
+					}else{
+						$this->_validationMessage = $element->getLabel().' must be at least '.$value.' characters';
+					}
 				}
 				$element->setMinLength($value);
 				break;

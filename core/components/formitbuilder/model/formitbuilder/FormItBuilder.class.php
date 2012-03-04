@@ -250,12 +250,12 @@ class FormItBuilder extends FormItBuilderCore{
 		$a_msgSegs = array();
 		foreach($jqFieldProps as $fieldID=>$a_fieldProp){
 			if(count($a_fieldProp)>0){
-				$a_ruleSegs[]=$fieldID.':{'.implode(',',$a_fieldProp).'}';
+				$a_ruleSegs[]='\''.$fieldID.'\':{'.implode(',',$a_fieldProp).'}';
 			}
 		}
 		foreach($jqFieldMessages as $fieldID=>$a_fieldMsg){
 			if(count($a_fieldMsg)>0){
-				$a_msgSegs[]=$fieldID.':{'.implode(',',$a_fieldMsg).'}';
+				$a_msgSegs[]='\''.$fieldID.'\':{'.implode(',',$a_fieldMsg).'}';
 			}
 		}
 		$s_js=
@@ -293,86 +293,95 @@ class FormItBuilder extends FormItBuilderCore{
 			}else{
 				$o_el = $o_elFull;
 			}
-			$elID = $o_el->getId();
-			if(isset($a_fieldProps[$elID])===false){
-				$a_fieldProps[$elID]=array();
+			$elId = $o_el->getId();
+			$elName = $o_el->getName();
+			if(isset($a_fieldProps[$elId])===false){
+				$a_fieldProps[$elId]=array();
 			}
-			if(isset($a_fieldProps[$elID])===false){
-				$a_fieldProps[$elID]=array();
+			if(isset($a_fieldProps[$elId])===false){
+				$a_fieldProps[$elId]=array();
 			}
-			if(isset($a_fieldProps_jqValidate[$elID])===false){
-				$a_fieldProps_jqValidate[$elID]=array();
+			if(isset($a_fieldProps_jqValidate[$elId])===false){
+				$a_fieldProps_jqValidate[$elId]=array();
 			}
-			if(isset($a_fieldProps_errstringFormIt[$elID])===false){
-				$a_fieldProps_errstringFormIt[$elID]=array();
+			if(isset($a_fieldProps_errstringFormIt[$elId])===false){
+				$a_fieldProps_errstringFormIt[$elId]=array();
 			}
-			if(isset($a_fieldProps_errstringJq[$elID])===false){
-				$a_fieldProps_errstringJq[$elID]=array();
+			if(isset($a_fieldProps_errstringJq[$elId])===false){
+				$a_fieldProps_errstringJq[$elId]=array();
 			}
-			if(isset($a_formProps_custValidate[$elID])===false){
-				$a_formProps_custValidate[$elID]=array();
+			if(isset($a_formProps_custValidate[$elId])===false){
+				$a_formProps_custValidate[$elId]=array();
 			}
 			
 			
 			switch($rule->getType()){
 				case FormRuleType::email:
-					$a_fieldProps[$elID][] = 'email';
-					$a_fieldProps_jqValidate[$elID][] = 'email:true';
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextEmailInvalid=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'email:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps[$elId][] = 'email';
+					$a_fieldProps_jqValidate[$elName][] = 'email:true';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextEmailInvalid=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elName][] = 'email:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::fieldMatch:
-					$a_fieldProps[$elID][] = 'password_confirm=^'.$o_elFull[1]->getId().'^';
-					$a_fieldProps_jqValidate[$elID][] = 'equalTo:"#'.$o_elFull[1]->getId().'"';
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextPasswordConfirm=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'equalTo:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps[$elId][] = 'password_confirm=^'.$o_elFull[1]->getId().'^';
+					$a_fieldProps_jqValidate[$elName][] = 'equalTo:"#'.$o_elFull[1]->getId().'"';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextPasswordConfirm=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elName][] = 'equalTo:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::maximumLength:
-					$a_fieldProps[$elID][] = 'maxLength=^'.$rule->getValue().'^';
-					$a_fieldProps_jqValidate[$elID][] = 'maxlength:'.$rule->getValue();
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextMaxLength=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'maxlength:"'.$rule->getValidationMessage().'"';
+					if(is_a($o_el, 'FormItBuilder_elementCheckboxGroup')){
+						$a_formProps_custValidate[$elId][]=array('type'=>'checkboxGroup','maxLength'=>$rule->getValue(),'errorMessage'=>$rule->getValidationMessage());
+						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
+					}else{
+						$a_fieldProps[$elId][] = 'maxLength=^'.$rule->getValue().'^';
+					}
+					$a_fieldProps_jqValidate[$elName][] = 'maxlength:'.$rule->getValue();
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMaxLength=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elName][] = 'maxlength:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::maximumValue:
-					$a_fieldProps[$elID][] = 'maxValue=^'.$rule->getValue().'^';
-					$a_fieldProps_jqValidate[$elID][] = 'max:'.$rule->getValue();
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextMaxValue=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'max:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps[$elId][] = 'maxValue=^'.$rule->getValue().'^';
+					$a_fieldProps_jqValidate[$elName][] = 'max:'.$rule->getValue();
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMaxValue=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elName][] = 'max:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::minimumLength:
-					$a_fieldProps[$elID][] = 'minLength=^'.$rule->getValue().'^';
-					$a_fieldProps_jqValidate[$elID][] = 'minlength:'.$rule->getValue();
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextMinLength=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'minlength:"'.$rule->getValidationMessage().'"';
+					if(is_a($o_el, 'FormItBuilder_elementCheckboxGroup')){
+						$a_formProps_custValidate[$elId][]=array('type'=>'checkboxGroup','minLength'=>$rule->getValue(),'errorMessage'=>$rule->getValidationMessage());
+						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
+					}else{
+						$a_fieldProps[$elId][] = 'minLength=^'.$rule->getValue().'^';
+					}
+					$a_fieldProps_jqValidate[$elName][] = 'minlength:'.$rule->getValue();
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMinLength=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elName][] = 'minlength:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::minimumValue:
-					$a_fieldProps[$elID][] = 'minValue=^'.$rule->getValue().'^';
-					$a_fieldProps_jqValidate[$elID][] = 'min:'.$rule->getValue();
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextMinValue=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'min:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps[$elId][] = 'minValue=^'.$rule->getValue().'^';
+					$a_fieldProps_jqValidate[$elName][] = 'min:'.$rule->getValue();
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMinValue=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elName][] = 'min:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::numeric:
-					$a_fieldProps[$elID][] = 'isNumber';
-					$a_fieldProps_jqValidate[$elID][] = 'digits:true';
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextIsNumber=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'digits:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps[$elId][] = 'isNumber';
+					$a_fieldProps_jqValidate[$elName][] = 'digits:true';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextIsNumber=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elName][] = 'digits:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::required:
-					$a_fieldProps[$elID][] = 'required';
-					$a_fieldProps_jqValidate[$elID][] = 'required:true';
-					$a_fieldProps_errstringFormIt[$elID][] = 'vTextRequired=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elID][] = 'required:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps[$elId][] = 'required';
+					$a_fieldProps_jqValidate[$elName][] = 'required:true';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextRequired=`'.$rule->getValidationMessage().'`';
+					$a_fieldProps_errstringJq[$elName][] = 'required:"'.$rule->getValidationMessage().'"';
 					break;
 				case FormRuleType::date:
 					$s_thisVal = $rule->getValue();
 					$s_thisErrorMsg = str_replace('===dateformat===',$s_thisVal,$rule->getValidationMessage());
 					
-					$a_formProps_custValidate[$elID][]=array('type'=>'date','fieldFormat'=>$s_thisVal,'errorMessage'=>$s_thisErrorMsg);
-					$a_fieldProps[$elID][] = 'FormItBuilder_customValidation';
-					//$a_fieldProps[$elID][] = 'isDate=^'.$rule->getValue().'^';
-					$a_fieldProps_jqValidate[$elID][] = 'dateFormat:\''.$s_thisVal.'\'';
-					//$a_fieldProps_errstringFormIt[$elID][] = 'vTextIsDate=`'.$s_thisErrorMsg.'`';
-					$a_fieldProps_errstringJq[$elID][] = 'dateFormat:"'.$s_thisErrorMsg.'"';
+					$a_formProps_custValidate[$elId][]=array('type'=>'date','fieldFormat'=>$s_thisVal,'errorMessage'=>$s_thisErrorMsg);
+					$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
+					$a_fieldProps_jqValidate[$elName][] = 'dateFormat:\''.$s_thisVal.'\'';
+					$a_fieldProps_errstringJq[$elName][] = 'dateFormat:"'.$s_thisErrorMsg.'"';
 					break;
 			}
 		}
@@ -402,18 +411,27 @@ class FormItBuilder extends FormItBuilderCore{
 			}else{
 				$s_typeClass = substr($s_elClass,14,strlen($s_elClass)-14);
 				$forId=$o_el->getId();
-				if(is_a($o_el,'FormItBuilder_elementRadioGroup')===true){
+				if(
+					is_a($o_el,'FormItBuilder_elementRadioGroup')===true
+					|| is_a($o_el,'FormItBuilder_elementCheckboxGroup')===true
+				){
 					$forId=$o_el->getId().'_0';
 				}
+				$s_forStr = ' for="'.htmlspecialchars($forId).'"';
+				
+				if(is_a($o_el,'FormItBuilder_elementReCaptcha')===true){
+					$s_forStr = ''; // dont use for attrib for Recaptcha (as it is an external program outside control of formitbuilder
+				}
+				
 				$b_required = $o_el->isRequired();
 				$s_form.='<div title="'.$o_el->getLabel().'" class="formSegWrap formSegWrap_'.htmlspecialchars($o_el->getId()).' '.$s_typeClass.($b_required===true?' required':'').'">';
 					if($o_el->showLabel()===true){
 
-						$s_form.=$nl.'  <label class="mainElLabel" for="'.htmlspecialchars($forId).'">'.$o_el->getLabel().'</label>';
+						$s_form.=$nl.'  <label class="mainElLabel"'.$s_forStr.'>'.$o_el->getLabel().'</label>';
 					}
 					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
 					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <div class="errorContainer"><label class="formiterror" for="'.htmlspecialchars($forId).'">[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
+						$s_form.=$nl.'  <div class="errorContainer"><label class="formiterror" '.$s_forStr.'>[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
 					}
 					$s_form.=$nl.'  </div>';
 				$s_form.=$nl.'</div>'.$nl;

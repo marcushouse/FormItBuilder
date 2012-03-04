@@ -1,8 +1,16 @@
 Changelog for FormItBuilder.
 
+FormItBuilder 1.0.1-pl
+====================================
+- Added new FormItBuilder_elementCheckboxGroup element (Thanks for the assistance Michelle)
+- Modified architecture of FormItBuilder_customValidation
+- More code comments
+
 FormItBuilder 0.1.9-rc3
 ====================================
 - Fixed a great number of trivial PHP errors in the ModX error log (Thanks for the report Alex)
+- Fixed some glitches in date custom validation
+- Code comments
 
 FormItBuilder 0.1.9-rc2
 ====================================

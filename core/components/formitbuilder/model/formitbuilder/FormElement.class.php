@@ -32,6 +32,7 @@ class FormItBuilder_htmlBlock extends FormItBuilder_baseElement{
 abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	
 	protected $_id;
+	protected $_name; //usually the same as the id, but not in the case of checkbox group that uses array syntax for name.
 	protected $_label;
 	
 	protected $_showLabel;
@@ -52,16 +53,18 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	 */
 	function __construct( $id, $label ) {		
 		$this->_required = false;
-		$this->_id = $id;
+		$this->_id = $this->_name = $id;
 		$this->_label = $label;
 		$this->_showLabel = true;
 		$this->_showInEmail = true;
 	}
 	
 	public function getId() { return $this->_id; }
+	public function getName() { return $this->_name; }
 	public function getLabel() { return $this->_label; }
         
 	public function setId($v) { $this->_id = $v; }
+	public function setName($v) { $this->_name = $v; }
 	public function setLabel($v) { $this->_label = $v; }
         
 	//single getter setter methods
@@ -270,7 +273,6 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 }
 
 class FormItBuilder_elementCheckbox extends FormItBuilder_element{
-	//TODO - Add getters and setters
 	private $_value;
 	private $_uncheckedValue;
 	private $_checked;
@@ -286,7 +288,7 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 		parent::__construct($id,$label);
 		
 		if($value===NULL){
-			$this->_value='Ticked';
+			$this->_value='Checked';
 		}else{
 			$this->_value=$value;
 		}
@@ -298,7 +300,7 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 		}
 		
 		if($uncheckedValue===NULL){
-			$this->_uncheckedValue='Unticked';
+			$this->_uncheckedValue='Unchecked';
 		}else{
 			$this->_uncheckedValue=$uncheckedValue;
 		}
@@ -316,6 +318,98 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 		return $s_ret;
 	}
 }
+
+class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
+	//Thanks Michelle
+	private $_values;
+	private $_showIndividualLabels;
+	private $_uncheckedValue;
+	protected $_maxLength;
+	protected $_minLength;
+	
+	
+	/**
+	 * FormIt constructor
+	 *
+	 * @param string $id Id of the element
+	 * @param string $label Label of the select element
+	 * @param array $values Array of title/value arrays in order of display.
+	 */
+	function __construct($id, $label, array $values) {
+		parent::__construct($id,$label);
+		$this->_name = $id.'[]';
+		$this->_values = $values;
+		$this->_showIndividualLabels = true;
+		$this->_uncheckedValue = 'None Selected';
+	}
+	
+	public function showIndividualLabels($v){
+		if(func_num_args() == 0) {
+			return $this->_showIndividualLabels;
+		}else{
+			$this->_showIndividualLabels = FormItBuilder::forceBool(func_get_arg(0));
+		}
+	}
+	
+	public function setMinLength($v) {
+		$v = FormItBuilder::forceNumber($v);
+		if($this->_maxLength!==NULL && $this->_maxLength<$v){
+			FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$v.'" when maximum length is "'.$this->_maxLength.'"');
+		}else{
+			if($this->_required===false){
+				FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$v.'" when field is not required.');
+			}else{
+				$this->_minLength = FormItBuilder::forceNumber($v);
+			}
+		}
+	}
+	
+	public function setMaxLength($v) {
+		$v = FormItBuilder::forceNumber($v);
+		if($this->_minLength!==NULL && $this->_minLength>$v){
+			throw FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set maximum length to "'.$v.'" when minimum length is "'.$this->_minLength.'"');
+		}else{
+			$this->_maxLength = FormItBuilder::forceNumber($v);
+		}
+	}
+	
+	public function outputHTML(){
+		$s_ret='<div class="checkboxGroupWrap">';
+		$i=0;
+		
+		$a_uncheckedVal = $this->_uncheckedValue;
+		if($this->_required===true){
+			$a_uncheckedVal=''; // we do this because FormIt will not validate it as empty if unchecked value has a value.
+		}
+		//hidden field with same name is so we get a post value regardless of tick status
+		$s_ret='<input type="hidden" name="'.htmlspecialchars($this->_name).'" value="'.htmlspecialchars($a_uncheckedVal).'" />';
+				
+		foreach($this->_values as $value){
+			$s_ret.='<div class="checkboxWrap">';
+			if($this->_showIndividualLabels===true){
+				$s_ret.='<label for="'.htmlspecialchars($this->_id.'_'.$i).'">'.htmlspecialchars($value['title']).'</label>';
+			}
+			// changed input type to checkbox
+			// added [] to name
+			$s_ret.='<div class="checkboxEl"><input type="checkbox" id="'.htmlspecialchars($this->_id.'_'.$i).'" name="'.htmlspecialchars($this->_name).'" value="'.htmlspecialchars($value['title']).'"';
+			$selectedStr='';
+			if(isset($_POST[$this->_id])===true){
+				if(in_array($value['title'],$_POST[$this->_id])===true){
+					$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).':FormItIsChecked=`'.htmlspecialchars($value['title']).'`]]';
+				}
+			}else{
+				if(isset($value['checked'])===true && $value['checked']===true){
+					$selectedStr=' checked="checked"';
+				}
+			}
+			$s_ret.=$selectedStr.' /></div></div>'."\r\n";
+			$i++;
+		}
+		$s_ret.='</div>';
+		return $s_ret;
+	}
+}
+
 class FormItBuilder_elementText extends FormItBuilder_element{
 	
 	protected $_fieldType;
