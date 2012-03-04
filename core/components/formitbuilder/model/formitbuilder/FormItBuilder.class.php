@@ -110,33 +110,33 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getPlaceholderJavascript() { return $this->_placeholderJavascript; } 
 	public function getFormTitle() { return $this->_formTitle; } 
 	
-	public function setMethod($v) { $this->_method = $v; } 
-	public function setRedirectDocument($v) { $this->_redirectDocument = $v; } 
-	public function setJqueryValidation($v) { $this->_jqueryValidation = self::forceBool($v); }
-	public function setPostHookName($v) { $this->_postHookName = $v; }
-	public function setEmailFromAddress($v) { $this->_emailFromAddress = $v; }
-	public function setEmailToAddress($v) { $this->_emailToAddress = $v; }
-	public function setEmailFromName($v) { $this->_emailFromName = $v; }
-	public function setEmailToName($v) { $this->_emailToName = $v; }
-	public function setEmailReplyToAddress($v) { $this->_emailReplyToAddress = $v; }
-	public function setEmailReplyToName($v) { $this->_emailReplyToName = $v; }
-	public function setEmailCCAddress($v) { $this->_emailCCAddress = $v; }
-	public function setEmailCCName($v) { $this->_emailCCName = $v; }
-	public function setEmailBCCAddress($v) { $this->_emailBCCAddress = $v; }
-	public function setEmailBCCName($v) { $this->_emailBCCName = $v; }
-	public function setEmailSubject($v) { $this->_emailSubject = $v; }
-	public function setEmailHeadHtml($v) { $this->_emailHeadHtml = $v; }
-	public function setHooks($v){$this->_hooks = self::forceArray($v);}
-	public function setEmailTpl($v){$this->_emailTpl = $v;}
-	public function setValidate($v) { $this->_validate = $v; }
-	public function setCustomValidators($v) { $this->_customValidators = $v; }
+	public function setMethod($value) { $this->_method = $value; } 
+	public function setRedirectDocument($value) { $this->_redirectDocument = $value; } 
+	public function setJqueryValidation($value) { $this->_jqueryValidation = self::forceBool($value); }
+	public function setPostHookName($value) { $this->_postHookName = $value; }
+	public function setEmailFromAddress($value) { $this->_emailFromAddress = $value; }
+	public function setEmailToAddress($value) { $this->_emailToAddress = $value; }
+	public function setEmailFromName($value) { $this->_emailFromName = $value; }
+	public function setEmailToName($value) { $this->_emailToName = $value; }
+	public function setEmailReplyToAddress($value) { $this->_emailReplyToAddress = $value; }
+	public function setEmailReplyToName($value) { $this->_emailReplyToName = $value; }
+	public function setEmailCCAddress($value) { $this->_emailCCAddress = $value; }
+	public function setEmailCCName($value) { $this->_emailCCName = $value; }
+	public function setEmailBCCAddress($value) { $this->_emailBCCAddress = $value; }
+	public function setEmailBCCName($value) { $this->_emailBCCName = $value; }
+	public function setEmailSubject($value) { $this->_emailSubject = $value; }
+	public function setEmailHeadHtml($value) { $this->_emailHeadHtml = $value; }
+	public function setHooks($value){$this->_hooks = self::forceArray($value);}
+	public function setEmailTpl($value){$this->_emailTpl = $value;}
+	public function setValidate($value) { $this->_validate = $value; }
+	public function setCustomValidators($value) { $this->_customValidators = $value; }
 	public function setDatabaseObjectForInsert($s_objName,$a_mapping){
 		$this->_databaseTableObjectName=$s_objName;
 		$this->_databaseTableFieldMapping=$a_mapping;
 	}
-	public function setStore($v) { $this->_store = $v; }
-	public function setPlaceholderJavascript($v) { $this->_placeholderJavascript = $v; }
-	public function setFormTitle($v) { $this->_formTitle = $v; }
+	public function setStore($value) { $this->_store = $value; }
+	public function setPlaceholderJavascript($value) { $this->_placeholderJavascript = $value; }
+	public function setFormTitle($value) { $this->_formTitle = $value; }
     
 	public function addElement(FormItBuilder_baseElement $o_formElement){
 		$this->_formElements[]=$o_formElement;

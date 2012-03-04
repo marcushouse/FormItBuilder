@@ -13,8 +13,8 @@ class FormItBuilder_baseElement extends FormItBuilderCore{
 class FormItBuilder_htmlBlock extends FormItBuilder_baseElement{
 	private $_html;
 	/**
-	 * The html to use as the element.
-	 * @param string $html 
+	 * Creates a segment of the specified html. This is great for introducing your own separators or wrappers around other elements in the form.
+	 * @param string $html The html code to use as the element
 	 */
 	function __construct( $html ) {		
 		$this->_html=$html;
@@ -40,7 +40,7 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	protected $_showInEmail;
 
 	/**
-	 * output function called when generating the form elements content.
+	 * output function called when generating the form element content.
 	 * @return type 
 	 */
 	abstract protected function outputHTML();
@@ -63,26 +63,26 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	public function getName() { return $this->_name; }
 	public function getLabel() { return $this->_label; }
         
-	public function setId($v) { $this->_id = $v; }
-	public function setName($v) { $this->_name = $v; }
-	public function setLabel($v) { $this->_label = $v; }
+	public function setId($value) { $this->_id = $value; }
+	public function setName($value) { $this->_name = $value; }
+	public function setLabel($value) { $this->_label = $value; }
         
 	//single getter setter methods
-	public function showLabel($v=null){
+	public function showLabel($value=null){
 		if(func_num_args() == 0) {
 			return $this->_showLabel;
 		}else{
 			$this->_showLabel = FormItBuilder::forceBool(func_get_arg(0));
 		}
 	}
-	public function isRequired($v=null){
+	public function isRequired($value=null){
 		if(func_num_args() == 0) {
 			return $this->_required;
 		}else{
 			$this->_required = FormItBuilder::forceBool(func_get_arg(0));
 		}
 	}
-	public function showInEmail($v=null){
+	public function showInEmail($value=null){
 		if(func_num_args() == 0) {
 			return $this->_showInEmail;
 		}else{
@@ -91,6 +91,10 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	}
 }
 class FormItBuilder_elementReCaptcha extends FormItBuilder_element{
+	/**
+	 * Creates a recaptcha field with the FormIt integrated recaptcha systems
+	 * @param type $label Label for the recaptcha
+	 */
 	function __construct($label) {
 		parent::__construct('recaptcha',$label);
 		$this->_showInEmail=false;
@@ -106,11 +110,26 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 	private $_values;
 	private $_defaultVal;
 	/**
-	 * FormIt constructor
+	 * Creates a select dropdown element
 	 *
-	 * @param string $id Id of the element
-	 * @param string $label Label of the select element
-	 * @param array $values Array of title/value arrays in order of display.
+	 * <code>
+	 * $a_usstates = array(
+	 *	''=>'Please select...',
+	 *	'AL'=>'Alabama',
+	 *	'AK'=>'Alaska',
+	 *	'AZ'=>'Arizona',
+	 *	'AR'=>'Arkansas',
+	 *	'CA'=>'California',
+	 *	'CO'=>'Colorado',
+	 *	'CT'=>'Connecticut'
+	 * );
+	 * $o_fe_usstates = new FormItBuilder_elementSelect('ussuate','Select a state',$a_usstates,'AR');
+	 * </code>
+	 * 
+	 * @param string $id The ID of the element
+	 * @param string $label The label of the select element
+	 * @param array $values An array of title/value arrays in order of display
+	 * @param string $defaultValue The default value to select in the dropdown field 
 	 */
 	function __construct($id, $label, array $values, $defaultValue=null) {
 		parent::__construct($id,$label);
@@ -146,11 +165,22 @@ class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
 	private $_defaultVal;
 	private $_showIndividualLabels;
 	/**
-	 * FormIt constructor
+	 * Creates a group of radio button elements
+	 * <code>
+	 * $a_performanceOptions = array(
+	 *	'opt1'=>'Poor',
+	 *	'opt2'=>'Needs Improvement',
+	 *	'opt3'=>'Average',
+	 *	'opt4'=>'Good',
+	 *	'opt5'=>'Excellent'
+	 * );
+	 * $o_fe_staff = new FormItBuilder_elementRadioGroup('staff_performance','How would you rate staff performance?',$a_performanceOptions,'opt3');
+	 * </code>
 	 *
-	 * @param string $id Id of the element
-	 * @param string $label Label of the select element
-	 * @param array $values Array of title/value arrays in order of display.
+	 * @param string $id The ID of the element
+	 * @param string $label The label of the select element
+	 * @param array $values An array of title/value arrays in order of display
+	 * @param string $defaultValue The value of the default selected radio option
 	 */
 	function __construct($id, $label, array $values, $defaultValue=null) {
 		parent::__construct($id,$label);
@@ -159,7 +189,7 @@ class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
 		$this->_defaultVal = $defaultValue;
 	}
 	
-	public function showIndividualLabels($v){
+	public function showIndividualLabels($value){
 		if(func_num_args() == 0) {
 			return $this->_showIndividualLabels;
 		}else{
@@ -192,23 +222,22 @@ class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
 	}
 }
 class FormItBuilder_elementButton extends FormItBuilder_element{
-	//TODO - Add getters and setters
 	protected $_type;
 	protected $_buttonLabel;
 	protected $_src;
 
 	/**
-	 * FormIt constructor
+	 * Creates a form button element
 	 *
-	 * @param string $id Id of the button
-	 * @param string $buttonLabel Label of the button
-	 * @param string $type Type of button, e.g button, submit, reset etc.
+	 * @param string $id The ID of the button
+	 * @param string $buttonLabel The label of the button
+	 * @param string $type The button type, e.g button, image, reset, submit etc.
 	 */
 	function __construct($id, $buttonLabel, $type ) {
 		parent::__construct($id,$buttonLabel);
 		$this->_showLabel = false;
 		$this->_showInEmail = false;
-		if($type=='button' || $type=='reset' || $type=='submit' || $type=='image'){
+		if($type=='button' || $type=='image' || $type=='reset' || $type=='submit'){
 			//ok -- valid type
 		}else{
 			FormItBuilder::throwError('[Element: '.$this->_id.'] Button "'.htmlspecialchars($type).'" must be of type "button", "reset", "image" or "submit"');
@@ -231,18 +260,17 @@ class FormItBuilder_elementButton extends FormItBuilder_element{
 }
 
 class FormItBuilder_elementTextArea extends FormItBuilder_element{
-	//TODO - Add getters and setters
 	private $_defaultVal;
 	private $_rows;
 	private $_cols;
 
 	/**
-	 * FormItBuilder_elementTextArea Constructor
-	 * @param string $id Id of text area
-	 * @param string $label Label of text area
-	 * @param int $rows The required rows attribute value that must be set on a valid XHTML textarea tag.
-	 * @param int $cols The required cols attribute value that must be set on a valid XHTML textarea tag.
-	 * @param string $defaultValue Default text to appear in text area.
+	 * Creates a text area element.
+	 * @param string $id ID of text area
+	 * @param string $label The label of text area
+	 * @param int $rows The required rows (attribute value that must be set on a valid XHTML textarea tag)
+	 * @param int $cols The required cols (attribute value that must be set on a valid XHTML textarea tag)
+	 * @param string $defaultValue The default text to be written into the text area
 	 */
 	function __construct($id, $label, $rows, $cols, $defaultValue=NULL) {
 		parent::__construct($id,$label);
@@ -281,30 +309,15 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 	 *
 	 * @param string $id ID of checkbox
 	 * @param string $label Label of checkbox
-	 * @param string $value Value of checkbox
-	 * @param boolean $checked Set as ticked by default
+	 * @param string $value Value to show if user selects the checkbox
+	 * @param boolean $uncheckedValue Value to show if user does not check the checkbox
+	 * @param boolean $checked Make checkbox ticked by default
 	 */
-	function __construct( $id, $label, $value=NULL, $uncheckedValue=NULL, $checked=NULL) {
+	function __construct( $id, $label, $value='Checked', $uncheckedValue='Unchecked', $checked=false) {
 		parent::__construct($id,$label);
-		
-		if($value===NULL){
-			$this->_value='Checked';
-		}else{
-			$this->_value=$value;
-		}
-		
-		if($checked===NULL){
-			$this->_checked=false;
-		}else{
-			$this->_checked=$checked;
-		}
-		
-		if($uncheckedValue===NULL){
-			$this->_uncheckedValue='Unchecked';
-		}else{
-			$this->_uncheckedValue=$uncheckedValue;
-		}
-		
+		$this->_value=$value;
+		$this->_checked=$checked;
+		$this->_uncheckedValue=$uncheckedValue;		
 	}
 	
 	public function outputHTML(){
@@ -324,12 +337,26 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 	private $_values;
 	private $_showIndividualLabels;
 	private $_uncheckedValue;
-	protected $_maxLength;
-	protected $_minLength;
+	private $_maxLength;
+	private $_minLength;
 	
 	
 	/**
-	 * FormIt constructor
+	 * Creates a group of checkboxes that allow rules such as required, minimum length (minimum number of items that must be checked) and maximum length (maximum number of items that can be checked). The list of checkbox values are specified in an array along with their default ticked state.
+	 * 
+	 * <code>
+	 * $a_checkArray=array(
+	 *	array('title'=>'Cheese','checked'=>false),
+	 *	array('title'=>'Grapes','checked'=>true),
+	 *	array('title'=>'Salad','checked'=>false),
+	 *	array('title'=>'Bread','checked'=>true)
+	 * );
+	 * $o_fe_checkgroup		= new FormItBuilder_elementCheckboxGroup('favFoods','Favorite Foods',$a_checkArray);
+	 * //Ensure at least 2 checkboxes are selected
+	 * $a_formRules[] = new FormRule(FormRuleType::minimumLength,$o_fe_checkgroup,2);
+	 * //Ensure no more than 3 checkboxes are selected
+	 * $a_formRules[] = new FormRule(FormRuleType::maximumLength,$o_fe_checkgroup,3);
+	 * </code>
 	 *
 	 * @param string $id Id of the element
 	 * @param string $label Label of the select element
@@ -343,7 +370,7 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 		$this->_uncheckedValue = 'None Selected';
 	}
 	
-	public function showIndividualLabels($v){
+	public function showIndividualLabels($value){
 		if(func_num_args() == 0) {
 			return $this->_showIndividualLabels;
 		}else{
@@ -351,25 +378,25 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 		}
 	}
 	
-	public function setMinLength($v) {
-		$v = FormItBuilder::forceNumber($v);
-		if($this->_maxLength!==NULL && $this->_maxLength<$v){
-			FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$v.'" when maximum length is "'.$this->_maxLength.'"');
+	public function setMinLength($value) {
+		$value = FormItBuilder::forceNumber($value);
+		if($this->_maxLength!==NULL && $this->_maxLength<$value){
+			FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$value.'" when maximum length is "'.$this->_maxLength.'"');
 		}else{
 			if($this->_required===false){
-				FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$v.'" when field is not required.');
+				FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$value.'" when field is not required.');
 			}else{
-				$this->_minLength = FormItBuilder::forceNumber($v);
+				$this->_minLength = FormItBuilder::forceNumber($value);
 			}
 		}
 	}
 	
-	public function setMaxLength($v) {
-		$v = FormItBuilder::forceNumber($v);
-		if($this->_minLength!==NULL && $this->_minLength>$v){
-			throw FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set maximum length to "'.$v.'" when minimum length is "'.$this->_minLength.'"');
+	public function setMaxLength($value) {
+		$value = FormItBuilder::forceNumber($value);
+		if($this->_minLength!==NULL && $this->_minLength>$value){
+			throw FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set maximum length to "'.$value.'" when minimum length is "'.$this->_minLength.'"');
 		}else{
-			$this->_maxLength = FormItBuilder::forceNumber($v);
+			$this->_maxLength = FormItBuilder::forceNumber($value);
 		}
 	}
 	
@@ -420,12 +447,13 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	protected $_minValue;
 	protected $_dateFormat;
 	protected $_defaultVal;
-	
-	/*
-	protected $_isNumeric;
-	protected $_isEmail;
-	 */
 
+	/**
+	 * Creates a text field.
+	 * @param type $id The ID of the text field
+	 * @param type $label The label of the text field
+	 * @param type $defaultValue The default text to be written into the text field
+	 */
 	function __construct( $id, $label, $defaultValue=NULL ) {
 		parent::__construct($id,$label);
 		$this->_defaultVal = $defaultValue;
@@ -442,71 +470,53 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	public function getMinValue() { return $this->_minValue; }
 	public function getDateFormat() { return $this->_dateFormat; }
 	
-	public function setMaxLength($v) {
-		$v = FormItBuilder::forceNumber($v);
-		if($this->_minLength!==NULL && $this->_minLength>$v){
-			throw FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set maximum length to "'.$v.'" when minimum length is "'.$this->_minLength.'"');
+	public function setMaxLength($value) {
+		$value = FormItBuilder::forceNumber($value);
+		if($this->_minLength!==NULL && $this->_minLength>$value){
+			throw FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set maximum length to "'.$value.'" when minimum length is "'.$this->_minLength.'"');
 		}else{
-			$this->_maxLength = FormItBuilder::forceNumber($v);
+			$this->_maxLength = FormItBuilder::forceNumber($value);
 		}
 	}
 	
-	public function setMinLength($v) {
-		$v = FormItBuilder::forceNumber($v);
-		if($this->_maxLength!==NULL && $this->_maxLength<$v){
-			FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$v.'" when maximum length is "'.$this->_maxLength.'"');
+	public function setMinLength($value) {
+		$value = FormItBuilder::forceNumber($value);
+		if($this->_maxLength!==NULL && $this->_maxLength<$value){
+			FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$value.'" when maximum length is "'.$this->_maxLength.'"');
 		}else{
 			if($this->_required===false){
-				FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$v.'" when field is not required.');
+				FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum length to "'.$value.'" when field is not required.');
 			}else{
-				$this->_minLength = FormItBuilder::forceNumber($v);
+				$this->_minLength = FormItBuilder::forceNumber($value);
 			}
 		}
 	}
 	
-	public function setMaxValue($v) {
-		$v = FormItBuilder::forceNumber($v);
-		if($this->_minValue!==NULL && $this->_minValue>$v){
-			FormItBuilder::throwError('Cannot set maximum value to "'.$v.'" when minimum value is "'.$this->_minValue.'"');
+	public function setMaxValue($value) {
+		$value = FormItBuilder::forceNumber($value);
+		if($this->_minValue!==NULL && $this->_minValue>$value){
+			FormItBuilder::throwError('Cannot set maximum value to "'.$value.'" when minimum value is "'.$this->_minValue.'"');
 		}else{
-			$this->_maxValue = FormItBuilder::forceNumber($v);
+			$this->_maxValue = FormItBuilder::forceNumber($value);
 		}
 	}
-	public function setMinValue($v) {
-		$v = FormItBuilder::forceNumber($v);
-		if($this->_maxValue!==NULL && $this->_maxValue<$v){
-			FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum value to "'.$v.'" when maximum value is "'.$this->_maxValue.'"');
+	public function setMinValue($value) {
+		$value = FormItBuilder::forceNumber($value);
+		if($this->_maxValue!==NULL && $this->_maxValue<$value){
+			FormItBuilder::throwError('[Element: '.$this->_id.'] Cannot set minimum value to "'.$value.'" when maximum value is "'.$this->_maxValue.'"');
 		}else{
-			$this->_minValue = FormItBuilder::forceNumber($v);
+			$this->_minValue = FormItBuilder::forceNumber($value);
 		}
 	}
 	
-	public function setDateFormat($v) {
-		$v=trim($v);
-		if(empty($v)===true){
+	public function setDateFormat($value) {
+		$value=trim($value);
+		if(empty($value)===true){
 			FormItBuilder::throwError('[Element: '.$this->_id.'] Date format is not valid.');
 		}else{
-			$this->_dateFormat=$v;
+			$this->_dateFormat=$value;
 		}
 	}
-	
-	
-	/*
-	public function isEmail($v=null){
-		if(func_num_args() == 0) {
-			return $this->_isEmail;
-		}else{
-			$this->_isEmail = FormItBuilder::forceBool(func_get_arg(0));
-		}
-	}
-	public function isNumeric($v=null){
-		if(func_num_args() == 0) {
-			return $this->_isNumeric;
-		}else{
-			$this->_isNumeric = FormItBuilder::forceBool(func_get_arg(0));
-		}
-	}
-	*/
 	
 	public function outputHTML(){
 		$a_classes=array();
@@ -534,12 +544,23 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	}
 }
 class FormItBuilder_elementPassword extends FormItBuilder_elementText{
+	/**
+	 * Creates a password field.
+	 * @param type $id The ID of the password field
+	 * @param type $label The label of the password field
+	 * @param type $defaultValue The default text to be written into the password field
+	 */
 	function __construct( $id, $label, $defaultValue=NULL ) {
 		parent::__construct($id,$label,$defaultValue);
 		$this->_fieldType='password';
 	}
 }
 class FormItBuilder_elementFile extends FormItBuilder_elementText{
+	/**
+	 * Creates a file field element allowing upload of file to the server (and attached to email)
+	 * @param type $id The ID of the file element
+	 * @param type $label The label of the file element
+	 */
 	function __construct( $id, $label ) {
 		parent::__construct($id,$label);
 		$this->_fieldType='file';

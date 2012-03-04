@@ -14,7 +14,7 @@ class FormRule extends FormItBuilderCore{
 	public function getValue() { return $this->_value; }
 	public function getValidationMessage() { return $this->_validationMessage; }
 	
-	public function setValidationMessage($v) { $this->_validationMessage = $v; }
+	public function setValidationMessage($value) { $this->_validationMessage = $value; }
 	
 	/**
 	 * Form Rule constructor
