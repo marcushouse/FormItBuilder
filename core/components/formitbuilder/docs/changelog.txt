@@ -3,6 +3,7 @@ Changelog for FormItBuilder.
 FormItBuilder 1.0.1-pl
 ====================================
 - Added new FormItBuilder_elementCheckboxGroup element (Thanks for the assistance Michelle)
+- Added setDescription method on form element classes (Allows a sub label to be displayed within the main label - Good suggestion Michelle)
 - Modified architecture of FormItBuilder_customValidation
 - More code comments
 

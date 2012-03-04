@@ -426,8 +426,11 @@ class FormItBuilder extends FormItBuilderCore{
 				$b_required = $o_el->isRequired();
 				$s_form.='<div title="'.$o_el->getLabel().'" class="formSegWrap formSegWrap_'.htmlspecialchars($o_el->getId()).' '.$s_typeClass.($b_required===true?' required':'').'">';
 					if($o_el->showLabel()===true){
-
-						$s_form.=$nl.'  <label class="mainElLabel"'.$s_forStr.'>'.$o_el->getLabel().'</label>';
+						$s_desc=$o_el->getDescription();
+						if(empty($s_desc)===false){
+							$s_desc='<span class="description">'.$s_desc.'</span>';
+						}
+						$s_form.=$nl.'  <label class="mainElLabel"'.$s_forStr.'><span class="mainLabel">'.$o_el->getLabel().'</span>'.$s_desc.'</label>';
 					}
 					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
 					if($o_el->showLabel()===true){

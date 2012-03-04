@@ -34,6 +34,7 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	protected $_id;
 	protected $_name; //usually the same as the id, but not in the case of checkbox group that uses array syntax for name.
 	protected $_label;
+	protected $_description;
 	
 	protected $_showLabel;
 	protected $_required;
@@ -57,15 +58,22 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 		$this->_label = $label;
 		$this->_showLabel = true;
 		$this->_showInEmail = true;
+		$this->_description = NULL; //must be set by setDescription
 	}
 	
 	public function getId() { return $this->_id; }
 	public function getName() { return $this->_name; }
 	public function getLabel() { return $this->_label; }
+	public function getDescription() { return $this->_description; }
         
 	public function setId($value) { $this->_id = $value; }
 	public function setName($value) { $this->_name = $value; }
 	public function setLabel($value) { $this->_label = $value; }
+	/**
+	 * Allows a sub label (or more descriptive label) to be set within the element label. Could be shown on hover or displayed with main label.
+	 * @return type 
+	 */
+	public function setDescription($value) { $this->_description = $value; }
         
 	//single getter setter methods
 	public function showLabel($value=null){
@@ -408,8 +416,8 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 		if($this->_required===true){
 			$a_uncheckedVal=''; // we do this because FormIt will not validate it as empty if unchecked value has a value.
 		}
-		//hidden field with same name is so we get a post value regardless of tick status
-		$s_ret='<input type="hidden" name="'.htmlspecialchars($this->_name).'" value="'.htmlspecialchars($a_uncheckedVal).'" />';
+		//hidden field with same name is so we get a post value regardless of tick status, must use ID and not name
+		$s_ret='<input type="hidden" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($a_uncheckedVal).'" />';
 				
 		foreach($this->_values as $value){
 			$s_ret.='<div class="checkboxWrap">';
