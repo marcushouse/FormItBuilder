@@ -1,7 +1,7 @@
 ----------------------
 Snippet: FormItBuilder
 ----------------------
-Version: 1.0.2 pl
+Version: 1.1.0 pl
 Created: March 29, 2012
 Author: Marcus House
 
