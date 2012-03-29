@@ -406,7 +406,9 @@ class FormItBuilder extends FormItBuilderCore{
 			if($s_elClass=='FormItBuilder_elementFile'){
 				$b_attachmentIncluded=true;
 			}
-			if(is_a($o_el,'FormItBuilder_htmlBlock')){
+			if(is_a($o_el,'FormItBuilder_elementHidden')){
+				$s_form.=$o_el->outputHTML();
+			}else if(is_a($o_el,'FormItBuilder_htmlBlock')){
 				$s_form.=$o_el->outputHTML();
 			}else{
 				$s_typeClass = substr($s_elClass,14,strlen($s_elClass)-14);

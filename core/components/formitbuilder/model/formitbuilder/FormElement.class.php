@@ -563,6 +563,26 @@ class FormItBuilder_elementPassword extends FormItBuilder_elementText{
 		$this->_fieldType='password';
 	}
 }
+class FormItBuilder_elementHidden extends FormItBuilder_elementText{
+	/**
+	 * Creates a password field.
+	 * @param type $id The ID of the password field
+	 * @param type $label The label of the password field
+	 * @param type $defaultValue The default text to be written into the password field
+	 */
+	function __construct( $id, $label, $defaultValue=NULL ) {
+		parent::__construct($id,$label,$defaultValue);
+		$this->_fieldType='hidden';
+		$this->_showInEmail=false;
+	}
+	public function showInEmail($value=null){
+		if(func_num_args() == 0) {
+			return $this->_showInEmail;
+		}else{
+			$this->_showInEmail = FormItBuilder::forceBool(func_get_arg(0));
+		}
+	}
+}
 class FormItBuilder_elementFile extends FormItBuilder_elementText{
 	/**
 	 * Creates a file field element allowing upload of file to the server (and attached to email)

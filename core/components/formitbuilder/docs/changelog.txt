@@ -1,5 +1,9 @@
 Changelog for FormItBuilder.
 
+FormItBuilder 1.0.2-pl
+====================================
+- Added new hidden field element (FormItBuilder_elementHidden) by default it doesn't appear in email output. Use showInEmail to send into email.
+
 FormItBuilder 1.0.1-pl
 ====================================
 - Added new FormItBuilder_elementCheckboxGroup element (Thanks for the assistance Michelle)
