@@ -268,6 +268,7 @@ class FormItBuilder extends FormItBuilderCore{
 	
 	private function getFormItBuilderOutput(){
 		$s_submitVar = 'submitVar_'.$this->_id;
+		$s_recaptchaJS='';
 		$b_posted = false;
 		if(isset($_REQUEST[$s_submitVar])===true){
 			$b_posted=true;
@@ -423,6 +424,7 @@ class FormItBuilder extends FormItBuilderCore{
 				
 				if(is_a($o_el,'FormItBuilder_elementReCaptcha')===true){
 					$s_forStr = ''; // dont use for attrib for Recaptcha (as it is an external program outside control of formitbuilder
+					$s_recaptchaJS=$o_el->getJsonConfig();
 				}
 				
 				$b_required = $o_el->isRequired();
@@ -489,6 +491,8 @@ class FormItBuilder extends FormItBuilderCore{
 		
 		$s_formItCmd='[[!FormIt?'
 		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?','.implode(',',$this->_hooks):'').'`'
+				
+		.(empty($s_recaptchaJS)===false?$nl.'&recaptchaJs=`'.$s_recaptchaJS.'`':'')
 		.(empty($this->_emailTpl)===false?$nl.'&emailTpl=`'.$this->_emailTpl.'`':'')
 			
 		.(empty($this->_emailToAddress)===false?$nl.'&emailTo=`'.$this->_emailToAddress.'`':'')

@@ -103,6 +103,8 @@ class FormItBuilder_elementReCaptcha extends FormItBuilder_element{
 	 * Creates a recaptcha field with the FormIt integrated recaptcha systems
 	 * @param type $label Label for the recaptcha
 	 */
+	protected $_jsonConfig;
+	
 	function __construct($label) {
 		parent::__construct('recaptcha',$label);
 		$this->_showInEmail=false;
@@ -111,6 +113,17 @@ class FormItBuilder_elementReCaptcha extends FormItBuilder_element{
 		$s_ret='[[+formit.recaptcha_html]]';
 		return $s_ret;
 	}
+	/**
+	 * Allows the setting of reCaptcha config. See https://developers.google.com/recaptcha/docs/customization for more information
+	 * @param type $jsonString 
+	 */
+	public function setJsonConfig($jsonString){
+		$this->_jsonConfig=$jsonString;
+	}	
+	public function getJsonConfig(){
+		return $this->_jsonConfig;
+	}	
+	
 }
 
 
@@ -565,10 +578,10 @@ class FormItBuilder_elementPassword extends FormItBuilder_elementText{
 }
 class FormItBuilder_elementHidden extends FormItBuilder_elementText{
 	/**
-	 * Creates a password field.
-	 * @param type $id The ID of the password field
-	 * @param type $label The label of the password field
-	 * @param type $defaultValue The default text to be written into the password field
+	 * Creates a hidden field.
+	 * @param type $id The ID of the hidden field
+	 * @param type $label The label of the hidden field
+	 * @param type $defaultValue The default value to be written into the hidden field
 	 */
 	function __construct( $id, $label, $defaultValue=NULL ) {
 		parent::__construct($id,$label,$defaultValue);
