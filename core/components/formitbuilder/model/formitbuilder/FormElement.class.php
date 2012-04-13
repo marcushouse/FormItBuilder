@@ -430,7 +430,7 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 			$a_uncheckedVal=''; // we do this because FormIt will not validate it as empty if unchecked value has a value.
 		}
 		//hidden field with same name is so we get a post value regardless of tick status, must use ID and not name
-		$s_ret='<input type="hidden" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($a_uncheckedVal).'" />';
+		$s_ret.='<input type="hidden" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($a_uncheckedVal).'" />';
 				
 		foreach($this->_values as $value){
 			$s_ret.='<div class="checkboxWrap">';
