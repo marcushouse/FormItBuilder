@@ -1,5 +1,10 @@
 Changelog for FormItBuilder.
 
+FormItBuilder 1.2.1-pl
+====================================
+- Repair bug in FormRuleType::date causing issues with javascript validation. (Thanks for the report Kiel)
+- Removed default "Created by FormItBuilder" form title attribute.
+
 FormItBuilder 1.2.0-pl
 ====================================
 - Repair bug in FormItBuilder_elementCheckboxGroup HTML output (missing open div)

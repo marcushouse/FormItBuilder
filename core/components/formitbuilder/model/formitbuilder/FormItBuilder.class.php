@@ -50,7 +50,7 @@ class FormItBuilder extends FormItBuilderCore{
 	*/
 	function __construct(modX &$modx, $id) {
 	    $this->modx = &$modx;
-		$this->_formTitle='Created by FormItBuilder';
+		$this->_formTitle=NULL;
 		$this->_method = 'post'; 
 		$this->_id = $id;
 		$this->_store = 1;
@@ -544,12 +544,12 @@ jQuery.validator.addMethod("dateFormat", function(value, element, format) {
 			newStr=newStr.replace("dd",day);
 
 			monthPos = format.indexOf("mm");
-			month = parseInt(value.substr(monthPos,2))+"";
+			month = parseInt(value.substr(monthPos,2),10)+"";
 			if(month.length==1){month="0"+month;}
 			newStr=newStr.replace("mm",month);
 
 			yearPos = format.indexOf("yyyy");
-			year = parseInt(value.substr(yearPos,4));
+			year = parseInt(value.substr(yearPos,4),10);
 			newStr=newStr.replace("yyyy",year);
 			
 			var testDate = new Date(year, month-1, day);
