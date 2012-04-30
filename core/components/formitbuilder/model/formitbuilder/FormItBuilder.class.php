@@ -17,7 +17,6 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_jqueryValidation;
 	private $_formElements;
 	private $_postHookName;
-	private $_headHtml;
 	private $_formTitle;
 	private $_emailFromAddress;
 	private $_emailSubject;
@@ -25,6 +24,7 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_emailFontSize;
 	private $_emailFontFamily;
 	private $_emailHeadHtml;
+	private $_emailFootHtml;
 	private $_rules;
 	private $_emailTpl;
 	private $_validate;
@@ -42,6 +42,21 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_emailCCName;
 	private $_emailBCCAddress;
 	private $_emailBCCName;
+	
+	private $_autoResponderTpl;
+	private $_autoResponderSubject;
+	private $_autoResponderToAddressField;
+	private $_autoResponderFromAddress;
+	private $_autoResponderFromName;
+	private $_autoResponderHtml;
+	private $_autoResponderReplyTo;
+	private $_autoResponderReplyToName;
+	private $_autoResponderCC;
+	private $_autoResponderCCName;
+	private $_autoResponderBCC;
+	private $_autoResponderBCCName;
+	
+	private $_autoResponderEmailContent;
 
 	/**
 	*
@@ -54,14 +69,18 @@ class FormItBuilder extends FormItBuilderCore{
 		$this->_method = 'post'; 
 		$this->_id = $id;
 		$this->_store = 1;
+		$this->_autoResponderHtml=true;
 		$this->_formElements=array();
 		$this->_rules=array();
 		$this->_redirectDocument=$this->modx->resource->get('id');
 		$this->_jqueryValidation=false;
 		$this->_emailTpl='FormItBuilderEmailTpl';
+		$this->_autoResponderTpl='FormItBuilderAutoResponderEmailTpl';
+		$this->_autoResponderEmailContent='<p>Thank you for your submission. A copy of the information you sent is shown below.</p>{{tableContent}}';
 		
 		$this->_emailFontSize='13px';
 		$this->_emailFontFamily='Helvetica,Arial,sans-serif';
+		$this->_emailFootHtml='<p>You can use this link to reply: <a href="mailto:{{fromEmailAddress}}?subject=RE: {{subject}}">{{fromEmailAddress}}</a></p>';
 		
 		//test that required snippets are available
 		$snippet_formIt = $this->modx->getObject('modSnippet',array('name'=>'FormIt'));
@@ -94,6 +113,7 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getEmailToAddress() { return $this->_emailToAddress; }
 	public function getEmailSubject() { return $this->_emailSubject; }
 	public function getEmailHeadHtml() { return $this->_emailHeadHtml; }
+	public function getEmailFootHtml() { return $this->_emailFootHtml; }
 	public function getHooks() { return $this->_hooks; }
 	public function getEmailTpl() { return $this->_emailTpl; }
 	public function getValidate() { return $this->_validate; }
@@ -109,6 +129,19 @@ class FormItBuilder extends FormItBuilderCore{
 	public function getStore() { return $this->_store; }
 	public function getPlaceholderJavascript() { return $this->_placeholderJavascript; } 
 	public function getFormTitle() { return $this->_formTitle; } 
+	
+	public function getAutoResponderTpl() { return $this->_autoResponderTpl; }
+	public function getAutoResponderSubject() { return $this->_autoResponderSubject; }
+	public function getAutoResponderToAddressField() { return $this->_autoResponderToAddressField; }
+	public function getAutoResponderFromAddress() { return $this->_autoResponderFromAddress; }
+	public function getAutoResponderFromName() { return $this->_autoResponderFromName; }
+	public function getAutoResponderHtml() { return $this->_autoResponderHtml; }
+	public function getAutoResponderReplyTo() { return $this->_autoResponderReplyTo; }
+	public function getAutoResponderCC() { return $this->_autoResponderCC; }
+	public function getAutoResponderCCName() { return $this->_autoResponderCCName; }
+	public function getAutoResponderBCC() { return $this->_autoResponderBCC; }
+	public function getAutoResponderBCCName() { return $this->_autoResponderBCCName; }
+	public function getAutoResponderEmailContent() { return $this->_autoResponderEmailContent; }	
 	
 	public function setMethod($value) { $this->_method = $value; } 
 	public function setRedirectDocument($value) { $this->_redirectDocument = $value; } 
@@ -126,6 +159,8 @@ class FormItBuilder extends FormItBuilderCore{
 	public function setEmailBCCName($value) { $this->_emailBCCName = $value; }
 	public function setEmailSubject($value) { $this->_emailSubject = $value; }
 	public function setEmailHeadHtml($value) { $this->_emailHeadHtml = $value; }
+	public function setEmailFootHtml($value) { $this->_emailFootHtml = $value; }
+
 	public function setHooks($value){$this->_hooks = self::forceArray($value);}
 	public function setEmailTpl($value){$this->_emailTpl = $value;}
 	public function setValidate($value) { $this->_validate = $value; }
@@ -137,6 +172,72 @@ class FormItBuilder extends FormItBuilderCore{
 	public function setStore($value) { $this->_store = $value; }
 	public function setPlaceholderJavascript($value) { $this->_placeholderJavascript = $value; }
 	public function setFormTitle($value) { $this->_formTitle = $value; }
+	
+	/**
+	 * Auto Responder - Tpl chunk for auto-response message.
+	 * @param type $value 
+	 */
+	public function setAutoResponderTpl($value) { $this->_autoResponderTpl = $value; }
+	/**
+	 * Auto Responder - The subject of the email.
+	 * @param type $value 
+	 */
+	public function setAutoResponderSubject($value) { $this->_autoResponderSubject = $value; }
+	/**
+	 * Auto Responder - The name of the form field to use as the submitters email. Defaults to "email".
+	 * @param type $value 
+	 */
+	public function setAutoResponderToAddressField($value) { $this->_autoResponderToAddressField = $value; }
+	/**
+	 * Auto Responder - Optional. If set, will specify the From: address for the email. Defaults to the `emailsender` system setting.
+	 * @param type $value 
+	 */
+	public function setAutoResponderFromAddress($value) { $this->_autoResponderFromAddress = $value; }
+	/**
+	 * Auto Responder - Optional. If set, will specify the From: name for the email.
+	 * @param type $value 
+	 */
+	public function setAutoResponderFromName($value) { $this->_autoResponderFromName = $value; }
+	/**
+	 * Auto Responder - Optional. Whether or not the email should be in HTML-format. Defaults to true.
+	 * @param type $value 
+	 */
+	public function setAutoResponderHtml($value) { $this->_autoResponderHtml = self::forceBool($value); }
+	/**
+	 * Auto Responder - An email to set as the reply-to.
+	 * @param type $value 
+	 */
+	public function setAutoResponderReplyTo($value) { $this->_autoResponderReplyTo = $value; }
+	/**
+	 * Auto Responder - Optional. The name for the Reply-To field.
+	 * @param type $value 
+	 */
+	public function setAutoResponderReplyToName($value) { $this->_autoResponderReplyToName = $value; }
+	/**
+	 * Auto Responder - Optional. A comma-separated list of emails to send via cc.
+	 * @param type $value 
+	 */
+	public function setAutoResponderCC($value) { $this->_autoResponderCC = $value; }
+	/**
+	 * Auto Responder - Optional. A comma-separated list of names to pair with the fiarCC values.
+	 * @param type $value 
+	 */
+	public function setAutoResponderCCName($value) { $this->_autoResponderCCName = $value; }
+	/**
+	 * Auto Responder - Optional. A comma-separated list of emails to send via bcc.
+	 * @param type $value 
+	 */
+	public function setAutoResponderBCC($value) { $this->_autoResponderBCC = $value; }
+	/**
+	 * Auto Responder - Optional. A comma-separated list of names to pair with the fiarBCC values.
+	 * @param type $value 
+	 */
+	public function setAutoResponderBCCName($value) { $this->_autoResponderBCCName = $value; }
+	/**
+	 * Auto Responder - Sets the email content.
+	 * @param type $value 
+	 */
+	public function setAutoResponderEmailContent($value) { $this->_autoResponderEmailContent = $value; }
     
 	public function addElement(FormItBuilder_baseElement $o_formElement){
 		$this->_formElements[]=$o_formElement;
@@ -194,16 +295,12 @@ class FormItBuilder extends FormItBuilderCore{
 		}
 	}
 	
-	private function getPostHookString(){
-		$NL="\r\n";
+	private function getFormTableContent(){
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
-		
-		$s_ret='<div style="'.$s_style.'">'.$NL.$this->_emailHeadHtml.$NL
-		.'<table cellpadding="4" cellspacing="0" style="'.$s_style.'">'.$NL;
-		
 		$bgCol1="#FFFFFF";
 		$bgCol2="#e4edf9";
 		$rowCount=0;
+		$s_ret='<table cellpadding="4" cellspacing="0" style="'.$s_style.'">'.$NL;
 		foreach($this->_formElements as $o_el){
 			if(get_class($o_el)=='FormItBuilder_htmlBlock'){
 				//do nothing
@@ -228,15 +325,46 @@ class FormItBuilder extends FormItBuilderCore{
 					
 					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlspecialchars($o_el->getLabel()).':</b></td><td>'.$s_val.'</td></tr>'.$NL;
 					$rowCount++;
-					
 				}
 			}
 		}
-
-		$s_ret.='</table>'.$NL
-		.'<p>You can use this link to reply: <a href="mailto:'.htmlspecialchars($this->_emailFromAddress).'?subject=RE:'.htmlspecialchars($this->_emailSubject).'">'.htmlspecialchars($this->_emailFromAddress).'</a></p>'.$NL
-		.'</div>';
+		$s_ret.='</table>'.$NL;
 		return $s_ret;
+	}
+	private function autoResponderEmailStr(){
+		$NL="\r\n";
+		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
+		
+		$s_emailContent = $this->_autoResponderEmailContent;
+		$s_emailContent = str_replace('{{tableContent}}', $this->getFormTableContent(), $s_emailContent);
+		
+		$s_ret='<div style="'.$s_style.'">'.$NL.$s_emailContent.$NL.'</div>';
+		return $s_ret;
+	}
+	
+	private function getPostHookString(){
+		$NL="\r\n";
+		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
+		
+		$s_footHTML = $this->_emailFootHtml;
+		$s_footHTML	= str_replace(
+			array('{{fromEmailAddress}}','{{subject}}'),
+			array(htmlspecialchars($this->_emailFromAddress),htmlspecialchars($this->_emailSubject)),
+			$s_footHTML
+		);
+
+		$s_ret='<div style="'.$s_style.'">'.$NL.$this->_emailHeadHtml.$NL
+		.$this->getFormTableContent().$NL
+		.$s_footHTML.$NL
+		.'</div>';
+		
+		return $s_ret;
+	}
+	public function processCoreHook(&$hook,&$formObj){
+		$hook->setValue('FormItBuilderEmailTpl',$formObj->postHook());
+		//$this->modx->setPlaceholder('FormItBuilderAutoResponderEmailTpl','asfsafa');
+		$hook->setValue('FormItBuilderAutoResponderEmailTpl',$formObj->autoResponderEmailStr());
+		return true;
 	}
 	public function postHook(){
 		return $this->getPostHookString();
@@ -493,25 +621,33 @@ class FormItBuilder extends FormItBuilderCore{
 		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?','.implode(',',$this->_hooks):'').'`'
 				
 		.(empty($s_recaptchaJS)===false?$nl.'&recaptchaJs=`'.$s_recaptchaJS.'`':'')
-		.(empty($this->_emailTpl)===false?$nl.'&emailTpl=`'.$this->_emailTpl.'`':'')
-			
-		.(empty($this->_emailToAddress)===false?$nl.'&emailTo=`'.$this->_emailToAddress.'`':'')
-		.(empty($this->_emailToName)===false?$nl.'&emailToName=`'.$this->_emailToName.'`':'')
-			
-		.(empty($this->_emailFromAddress)===false?$nl.'&emailFrom=`'.$this->_emailFromAddress.'`':'')
-		.(empty($this->_emailFromName)===false?$nl.'&emailFromName=`'.$this->_emailFromName.'`':'')
-			
-		.(empty($this->_emailReplyToAddress)===false?$nl.'&emailReplyTo=`'.$this->_emailReplyToAddress.'`':'')
-		.(empty($this->_emailReplyToName)===false?$nl.'&emailReplyToName=`'.$this->_emailReplyToName.'`':'')
-		
-		.(empty($this->_emailCCAddress)===false?$nl.'&emailCC=`'.$this->_emailCCAddress.'`':'')
-		.(empty($this->_emailCCName)===false?$nl.'&emailCCName=`'.$this->_emailCCName.'`':'')
-			
-		.(empty($this->_emailBCCAddress)===false?$nl.'&emailBCC=`'.$this->_emailBCCAddress.'`':'')
-		.(empty($this->_emailBCCName)===false?$nl.'&emailBCCName=`'.$this->_emailBCCName.'`':'')
-			
 		.(empty($this->_customValidators)===false?$nl.'&customValidators=`'.$this->_customValidators.'`':'')
 			
+		.(empty($this->_emailTpl)===false?$nl.'&emailTpl=`'.$this->_emailTpl.'`':'')
+		.(empty($this->_emailToAddress)===false?$nl.'&emailTo=`'.$this->_emailToAddress.'`':'')
+		.(empty($this->_emailToName)===false?$nl.'&emailToName=`'.$this->_emailToName.'`':'')
+		.(empty($this->_emailFromAddress)===false?$nl.'&emailFrom=`'.$this->_emailFromAddress.'`':'')
+		.(empty($this->_emailFromName)===false?$nl.'&emailFromName=`'.$this->_emailFromName.'`':'')
+		.(empty($this->_emailReplyToAddress)===false?$nl.'&emailReplyTo=`'.$this->_emailReplyToAddress.'`':'')
+		.(empty($this->_emailReplyToName)===false?$nl.'&emailReplyToName=`'.$this->_emailReplyToName.'`':'')
+		.(empty($this->_emailCCAddress)===false?$nl.'&emailCC=`'.$this->_emailCCAddress.'`':'')
+		.(empty($this->_emailCCName)===false?$nl.'&emailCCName=`'.$this->_emailCCName.'`':'')
+		.(empty($this->_emailBCCAddress)===false?$nl.'&emailBCC=`'.$this->_emailBCCAddress.'`':'')
+		.(empty($this->_emailBCCName)===false?$nl.'&emailBCCName=`'.$this->_emailBCCName.'`':'')
+		
+		.(empty($this->_autoResponderTpl)===false?$nl.'&fiarTpl=`'.$this->_autoResponderTpl.'`':'')
+		.(empty($this->_autoResponderSubject)===false?$nl.'&fiarSubject=`'.$this->_autoResponderSubject.'`':'')
+		.(empty($this->_autoResponderToAddressField)===false?$nl.'&fiarToField=`'.$this->_autoResponderToAddressField.'`':'')
+		.(empty($this->_autoResponderFromAddress)===false?$nl.'&fiarFrom=`'.$this->_autoResponderFromAddress.'`':'')
+		.(empty($this->_autoResponderFromName)===false?$nl.'&fiarFromName=`'.$this->_autoResponderFromName.'`':'')
+		.(empty($this->_autoResponderReplyTo)===false?$nl.'&fiarReplyTo=`'.$this->_autoResponderReplyTo.'`':'')
+		.(empty($this->_autoResponderReplyToName)===false?$nl.'&fiarReplyToName=`'.$this->_autoResponderReplyToName.'`':'')
+		.(empty($this->_autoResponderCC)===false?$nl.'&fiarCC=`'.$this->_autoResponderCC.'`':'')
+		.(empty($this->_autoResponderCCName)===false?$nl.'&fiarCCName=`'.$this->_autoResponderCCName.'`':'')
+		.(empty($this->_autoResponderBCC)===false?$nl.'&fiarBCC=`'.$this->_autoResponderBCC.'`':'')
+		.(empty($this->_autoResponderBCCName)===false?$nl.'&fiarBCCName=`'.$this->_autoResponderBCCName.'`':'')
+		.$nl.'&fiarHtml=`'.($this->_autoResponderHtml===false?'0':'1').'`'				
+				
 		.$nl.'&emailSubject=`'.$this->_emailSubject.'`'
 		.$nl.'&emailUseFieldForSubject=`1`'
 		.$nl.'&redirectTo=`'.$this->_redirectDocument.'`'
@@ -539,7 +675,7 @@ jQuery.validator.addMethod("dateFormat", function(value, element, format) {
 			var newStr = format;
 			
 			dayPos = format.indexOf("dd");
-			day = parseInt(value.substr(dayPos,2))+"";
+			day = parseInt(value.substr(dayPos,2),10)+"";
 			if(day.length==1){day="0"+day;}
 			newStr=newStr.replace("dd",day);
 
