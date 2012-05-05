@@ -1,6 +1,11 @@
 <?php
 /**
+ * @package FormItBuilder
+ */
+
+/**
  * A simple class to define strings as constants for rule types to make them more easily read.
+ * @package FormItBuilder
  */
 class FormRuleType extends FormItBuilderCore{
 	const fieldMatch = 'fieldMath';

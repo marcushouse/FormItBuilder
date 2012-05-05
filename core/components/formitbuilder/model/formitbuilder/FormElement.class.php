@@ -1,14 +1,26 @@
 <?php
+/**
+ * Contains all the form element classes.
+ * @package FormItBuilder
+ */
+
+/**
+ * Required Files
+ */
 require_once 'FormItBuilderCore.class.php';
+
 
 /**
  * A primitive form element used as a base to extend into a variety of elements
+ * @access private
+ * @package FormItBuilder
  */
 class FormItBuilder_baseElement extends FormItBuilderCore{
 }
 
 /**
  * A primitive form element used only to inject raw html and place between other elements.
+ * @package FormItBuilder
  */
 class FormItBuilder_htmlBlock extends FormItBuilder_baseElement{
 	private $_html;
@@ -29,6 +41,10 @@ class FormItBuilder_htmlBlock extends FormItBuilder_baseElement{
 	}
 }
 
+/**
+ * @access private
+ * @package FormItBuilder
+ */
 abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	
 	protected $_id;
@@ -98,6 +114,9 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 		}
 	}
 }
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementReCaptcha extends FormItBuilder_element{
 	/**
 	 * Creates a recaptcha field with the FormIt integrated recaptcha systems
@@ -126,7 +145,9 @@ class FormItBuilder_elementReCaptcha extends FormItBuilder_element{
 	
 }
 
-
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementSelect extends FormItBuilder_element{
 	private $_values;
 	private $_defaultVal;
@@ -181,6 +202,10 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 		return $s_ret;
 	}
 }
+
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
 	private $_values;
 	private $_defaultVal;
@@ -242,6 +267,10 @@ class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
 		return $s_ret;
 	}
 }
+
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementButton extends FormItBuilder_element{
 	protected $_type;
 	protected $_buttonLabel;
@@ -280,6 +309,9 @@ class FormItBuilder_elementButton extends FormItBuilder_element{
 	}
 }
 
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementTextArea extends FormItBuilder_element{
 	private $_defaultVal;
 	private $_rows;
@@ -321,6 +353,9 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 	}
 }
 
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 	private $_value;
 	private $_uncheckedValue;
@@ -353,6 +388,9 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 	}
 }
 
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 	//Thanks Michelle
 	private $_values;
@@ -458,6 +496,9 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 	}
 }
 
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementText extends FormItBuilder_element{
 	
 	protected $_fieldType;
@@ -564,6 +605,10 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 		return $s_ret;
 	}
 }
+
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementPassword extends FormItBuilder_elementText{
 	/**
 	 * Creates a password field.
@@ -576,6 +621,10 @@ class FormItBuilder_elementPassword extends FormItBuilder_elementText{
 		$this->_fieldType='password';
 	}
 }
+
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementHidden extends FormItBuilder_elementText{
 	/**
 	 * Creates a hidden field.
@@ -596,6 +645,9 @@ class FormItBuilder_elementHidden extends FormItBuilder_elementText{
 		}
 	}
 }
+/**
+ * @package FormItBuilder
+ */
 class FormItBuilder_elementFile extends FormItBuilder_elementText{
 	/**
 	 * Creates a file field element allowing upload of file to the server (and attached to email)

@@ -1,7 +1,16 @@
 <?php
+/**
+ * @package FormItBuilder
+ */
+
+/**
+ * Required Files
+ */
 require_once 'FormRuleType.class.php';
+
 /**
  * Contains rule methods applied to an element. The FormItBuilder object is then assigned rules using the addRules method.
+ * @package FormItBuilder
  */
 class FormRule extends FormItBuilderCore{
 	private $_type;

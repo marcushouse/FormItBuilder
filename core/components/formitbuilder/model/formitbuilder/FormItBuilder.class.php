@@ -1,7 +1,16 @@
 <?php
+/**
+ * @package FormItBuilder
+ */
+
+/**
+ * Required Files
+ */
 require_once 'FormItBuilderCore.class.php';
+
 /**
  * The main FormItBuilder methods. Most of the program bulk lives within this class and handles a great number of set/get methods and output methods.
+ * @package FormItBuilder
  */
 class FormItBuilder extends FormItBuilderCore{
 	/**
@@ -9,7 +18,6 @@ class FormItBuilder extends FormItBuilderCore{
 	 * @var modX $modx
 	 */
 	private $modx;
-
 	private $_method;
 	private $_id;
 	private $_redirectDocument;
@@ -17,7 +25,6 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_jqueryValidation;
 	private $_formElements;
 	private $_postHookName;
-	private $_formTitle;
 	private $_emailFromAddress;
 	private $_emailSubject;
 	private $_emailToAddress;
@@ -59,16 +66,16 @@ class FormItBuilder extends FormItBuilderCore{
 	private $_autoResponderEmailContent;
 
 	/**
-	*
-	* @param modX $modx Reference to the core modX object
-	* @param string $id Id of the form
-	*/
-	function __construct(modX &$modx, $id) {
+	 * The main construction for FormItBuilder. All elements and rules are attached to this object.
+	 * @param modx &$modx Reference to the core modX object
+	 * @param string $id Id of the form
+	 */
+	function __construct(&$modx, $id) {
 	    $this->modx = &$modx;
-		$this->_formTitle=NULL;
+
 		$this->_method = 'post'; 
 		$this->_id = $id;
-		$this->_store = 1;
+		$this->_store = true;
 		$this->_autoResponderHtml=true;
 		$this->_formElements=array();
 		$this->_rules=array();
@@ -88,7 +95,10 @@ class FormItBuilder extends FormItBuilderCore{
 			FormItBuilder::throwError('FormIt snippet does not appear to be installed. Please install FormIt package.');
 		}
 	}
-	
+	/**
+	 * Adds a single rule to the FormItBuilder object.
+	 * @param FormRule $formRule 
+	 */
 	public function addRule(FormRule $formRule){
 		if(is_a($formRule,'FormRule')===false){
 			FormItBuilder::throwError('Form rule "'.$formRule.'" is not a valid FormRule type. Recommend using FormRuleType constants to define rule type.');
@@ -96,158 +106,431 @@ class FormItBuilder extends FormItBuilderCore{
 			$this->_rules[]=$formRule;
 		}
 	}
-	
+	/**
+	 * Adds multiple FormRule objects to the FormItBuilder object.
+	 * @param array $rules 
+	 */
 	public function addRules($rules){
 		foreach($rules as $rule){
 			$this->addRule($rule);
 		}
 	}
 	
-	//getters & setters
-	public function getMethod() { return $this->_method; } 
+	/**
+	 * Returns the form method (get, post etc)
+	 * @return string 
+	 */
+	public function getMethod() { return $this->_method; }
+	/**
+	 * Returns the form ID.
+	 * @return string
+	 */
 	public function getId() { return $this->_id; } 
+	/**
+	 * Returns the forms redirectDocument setting.
+	 * @return string
+	 */
 	public function getRedirectDocument() { return $this->_redirectDocument; } 
+	/**
+	 * Returns the forms jQuery validate setting.
+	 * @return boolean
+	 */
 	public function getJqueryValidation() { return $this->_jqueryValidation; } 
+	/**
+	 * Returns the post hook snippet name (normally set to the same snippet name for the FormItBuilder form)
+	 * @return string
+	 */
 	public function getPostHookName() { return $this->_postHookName; }
+	/**
+	 * Returns the FROM email address used when sending email.
+	 * @return string
+	 */
 	public function getEmailFromAddress() { return $this->_emailFromAddress; }
+	/**
+	 * Returns the TO email address used when sending email.
+	 * @return string
+	 */
 	public function getEmailToAddress() { return $this->_emailToAddress; }
+	/**
+	 * Returns the email subject used when sending email.
+	 * @return string
+	 */
 	public function getEmailSubject() { return $this->_emailSubject; }
+	/**
+	 * Returns the header HTML used in the email.
+	 * @return string
+	 */
 	public function getEmailHeadHtml() { return $this->_emailHeadHtml; }
+	/**
+	 * Returns the footer HTML used in the email.
+	 * @return string
+	 */
 	public function getEmailFootHtml() { return $this->_emailFootHtml; }
+	/**
+	 * Returns the list of hooks that are set in the formIT call. e.g. "spam","email","redirect" etc.
+	 * @return array
+	 */
 	public function getHooks() { return $this->_hooks; }
+	/**
+	 * Returns the email template chunks used by the FormIt call. By default this is set to use FormItBuilderEmailTpl which is an installed chunk containing a single placeholder to allow FormItBuilder to dynamically generate and create the chunk content on the fly.
+	 * @return array
+	 */
 	public function getEmailTpl() { return $this->_emailTpl; }
+	/**
+	 * Returns the custom validation methods used (doesnt include the validation rules automatically set by rules etc).
+	 * @return string 
+	 */
 	public function getValidate() { return $this->_validate; }
+	/**
+	 * Returns any customValidator settings used by the form. (Used with the FormIT "validate" command to create custom validation. See customValidators in FormIt documentation for more information).
+	 * @return string
+	 */
 	public function getCustomValidators() { return $this->_customValidators; }
+	/**
+	 * Returns the FROM email name used when sending email.
+	 * @return string
+	 */
 	public function getEmailFromName() { return $this->_emailFromName; }
+	/**
+	 * Returns the TO email name used when sending email.
+	 * @return string 
+	 */
 	public function getEmailToName() { return $this->_emailToName; }
+	/**
+	 * Returns the REPLY-TO email address used when sending email.
+	 * @return string 
+	 */
 	public function getEmailReplyToAddress() { return $this->_emailReplyToAddress; }
+	/**
+	 * Returns the REPLY-TO email name used when sending email.
+	 * @return string 
+	 */
 	public function getEmailReplyToName() { return $this->_emailReplyToName; }
+	/**
+	 * Returns the CC email address used when sending email.
+	 * @return string 
+	 */
 	public function getEmailCCAddress() { return $this->_emailCCAddress; }
+	/**
+	 * Returns the CC email name used when sending email.
+	 * @return string 
+	 */
 	public function getEmailCCName() { return $this->_emailCCName; }
+	/**
+	 * Returns the BCC email address used when sending email.
+	 * @return string 
+	 */
 	public function getEmailBCCAddress() { return $this->_emailBCCAddress; }
+	/**
+	 * Returns the BCC email name used when sending email.
+	 * @return string 
+	 */
 	public function getEmailBCCName() { return $this->_emailBCCName; }
+	/**
+	 * Returns the store option used. See the FormIt "store" option.
+	 * @return boolean
+	 */
 	public function getStore() { return $this->_store; }
+	/**
+	 * Returns javascript placeholder setting used.
+	 * @return string
+	 */
 	public function getPlaceholderJavascript() { return $this->_placeholderJavascript; } 
-	public function getFormTitle() { return $this->_formTitle; } 
-	
+	/**
+	 * Returns the Auto Responder template chunk used.
+	 * @return string
+	 */
 	public function getAutoResponderTpl() { return $this->_autoResponderTpl; }
+	/**
+	 * Auto Responder - Returns the Auto Responder subject used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderSubject() { return $this->_autoResponderSubject; }
+	/**
+	 * Auto Responder - Returns the Auto Responder TO email address FIELD used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderToAddressField() { return $this->_autoResponderToAddressField; }
+	/**
+	 * Auto Responder - Returns the Auto Responder FROM email address used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderFromAddress() { return $this->_autoResponderFromAddress; }
+	/**
+	 * Auto Responder - Returns the Auto Responder FROM email name used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderFromName() { return $this->_autoResponderFromName; }
+	/**
+	 * Auto Responder - Returns the Auto Responder HTML setting used in the email.
+	 * @return boolean
+	 */
 	public function getAutoResponderHtml() { return $this->_autoResponderHtml; }
+	/**
+	 * Auto Responder - Returns the Auto Responder REPLY-TO email address used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderReplyTo() { return $this->_autoResponderReplyTo; }
+	/**
+	 * Auto Responder - Returns the Auto Responder CC email address used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderCC() { return $this->_autoResponderCC; }
+	/**
+	 * Auto Responder - Returns the Auto Responder CC email name used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderCCName() { return $this->_autoResponderCCName; }
+	/**
+	 * Auto Responder - Returns the Auto Responder BCC email address used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderBCC() { return $this->_autoResponderBCC; }
+	/**
+	 * Auto Responder - Returns the Auto Responder BCC email name used in the email.
+	 * @return string
+	 */
 	public function getAutoResponderBCCName() { return $this->_autoResponderBCCName; }
+	/**
+	 * Auto Responder - Returns the Auto Responder email content.
+	 * @return string
+	 */
 	public function getAutoResponderEmailContent() { return $this->_autoResponderEmailContent; }	
-	
-	public function setMethod($value) { $this->_method = $value; } 
+	/**
+	 * Sets the form method (get, post etc)
+	 * @return string
+	 */
+	public function setMethod($value) { $this->_method = $value; }
+	/**
+	 * Sets the forms redirectDocument setting (used if the redirect hook is also set).
+	 * @param string $value The resource ID of the page to redirect to post success.
+	 */
 	public function setRedirectDocument($value) { $this->_redirectDocument = $value; } 
+	/**
+	 * Sets the forms jQuery validate setting. When set to true extra javascript is output for "jQuery Validate" to use. If jQuery Validate is installed correctly, forms should validate with inline javascript (jQuery) as well as with FormIt validation with PHP.
+	 * @param boolean $value
+	 */
 	public function setJqueryValidation($value) { $this->_jqueryValidation = self::forceBool($value); }
+	/**
+	 * Sets the post hook snippet name (normally set to the same snippet name for the FormItBuilder form).
+	 * @param string $value
+	 */
 	public function setPostHookName($value) { $this->_postHookName = $value; }
+	/**
+	 * Sets the FROM email address used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailFromAddress($value) { $this->_emailFromAddress = $value; }
+	/**
+	 * Sets the TO email address used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailToAddress($value) { $this->_emailToAddress = $value; }
+	/**
+	 * Sets the FROM email address used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailFromName($value) { $this->_emailFromName = $value; }
+	/**
+	 * Sets the TO email name used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailToName($value) { $this->_emailToName = $value; }
+	/**
+	 * Sets the REPLY-TO email address used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailReplyToAddress($value) { $this->_emailReplyToAddress = $value; }
+	/**
+	 * Sets the REPLY-TO email name used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailReplyToName($value) { $this->_emailReplyToName = $value; }
+	/**
+	 * Sets the CC email address used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailCCAddress($value) { $this->_emailCCAddress = $value; }
+	/**
+	 * Sets the FROM email name used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailCCName($value) { $this->_emailCCName = $value; }
+	/**
+	 * Sets the BCC email address used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailBCCAddress($value) { $this->_emailBCCAddress = $value; }
+	/**
+	 * Sets the BCC email name used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailBCCName($value) { $this->_emailBCCName = $value; }
+	/**
+	 * Sets the email subject used when sending email.
+	 * @param string $value
+	 */
 	public function setEmailSubject($value) { $this->_emailSubject = $value; }
+	/**
+	 * Sets the header HTML used in the email.
+	 * @param string $value
+	 */
 	public function setEmailHeadHtml($value) { $this->_emailHeadHtml = $value; }
+	/**
+	 * Sets the footer HTML used in the email.
+	 * @param string $value
+	 */
 	public function setEmailFootHtml($value) { $this->_emailFootHtml = $value; }
-
+	/**
+	 * Sets the list of hooks that are set in the formIT call. e.g. "spam","email","redirect" etc.
+	 * @param array $value Array containing hook strings
+	 */
 	public function setHooks($value){$this->_hooks = self::forceArray($value);}
+	/**
+	 * Sets the email template chunk used by the FormIt call. By default this is set to use FormItBuilderEmailTpl which is an installed chunk containing a single placeholder to allow FormItBuilder to dynamically generate and create the chunk content on the fly.
+	 * @param string $value
+	 */
 	public function setEmailTpl($value){$this->_emailTpl = $value;}
+	/**
+	 * Sets the custom validation methods used (doesnt include the validation rules automatically set by rules etc).
+	 * @param string $value 
+	 */
 	public function setValidate($value) { $this->_validate = $value; }
+	/**
+	 * Sets the customValidator settings used by the form. (Used with the FormIT "validate" command to create custom validation. See customValidators in FormIt documentation for more information).
+	 * @param string $value 
+	 */
 	public function setCustomValidators($value) { $this->_customValidators = $value; }
+	/**
+	 * Sets the database table object to use to automatically insert the form information on a successful submission.
+	 * <code>
+	 * //Demo Table Mapping (Allows auto entry of data into an mysql Table (xPDO object)
+	 * $o_form->setDatabaseObjectForInsert('tableClass',array(
+	 *	array($o_name,'name'),
+	 *	array($o_address,'address'),
+	 *	array($o_country,'country'),           
+	 * ));
+	 * </code>
+	 * @param object $s_objName The table class name used by the XPDO object.
+	 * @param array $a_mapping Should contain an array which maps each form object to a field key within the table.
+	 */
 	public function setDatabaseObjectForInsert($s_objName,$a_mapping){
 		$this->_databaseTableObjectName=$s_objName;
 		$this->_databaseTableFieldMapping=$a_mapping;
 	}
-	public function setStore($value) { $this->_store = $value; }
+	/**
+	 * Sets the store option used by FormIt. If true, will store the data in the cache for retrieval using the FormItRetriever snippet.
+	 * @param boolean $value 
+	 */
+	public function setStore($value) { $this->_store = self::forceBool($value); }
+	/**
+	 * Sets a placeholder to use to inject any javascript used to control the form (jQuery Validate etc). By default any javascript required for forms is output inline after the closeure of the form (as you can see when viewing the HTML source). This may not be desirable for some developers as javascript order may be an issue. For simplicity it has been set this way by default for the majority of users that want to get their form up and running with minimal fuss.
+	 * 
+	 * To do this add the following code to your form object.
+	 * <code>
+	 * $o_form->setPlaceholderJavascript('FormItBuilder_javascript_myForm');
+	 * </code>
+	 * The string used in this method will be your placeholder name. Simply add the placeholder code to your template like so
+	 * <code>
+	 * <script src="assets/js/jquery.min.js" type="text/javascript"></script>
+	 * <script src="assets/js/jquery.validate.min.js" type="text/javascript"></script>
+	 * <script type="text/javascript">
+	 * // <![CDATA[
+	 * [[+FormItBuilder_javascript_myForm]]
+	 * // ]]>
+	 * </script>
+	 * </code>
+	 * @param string $value 
+	 */
 	public function setPlaceholderJavascript($value) { $this->_placeholderJavascript = $value; }
-	public function setFormTitle($value) { $this->_formTitle = $value; }
 	
 	/**
 	 * Auto Responder - Tpl chunk for auto-response message.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderTpl($value) { $this->_autoResponderTpl = $value; }
 	/**
 	 * Auto Responder - The subject of the email.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderSubject($value) { $this->_autoResponderSubject = $value; }
 	/**
 	 * Auto Responder - The name of the form field to use as the submitters email. Defaults to "email".
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderToAddressField($value) { $this->_autoResponderToAddressField = $value; }
 	/**
 	 * Auto Responder - Optional. If set, will specify the From: address for the email. Defaults to the `emailsender` system setting.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderFromAddress($value) { $this->_autoResponderFromAddress = $value; }
 	/**
 	 * Auto Responder - Optional. If set, will specify the From: name for the email.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderFromName($value) { $this->_autoResponderFromName = $value; }
 	/**
 	 * Auto Responder - Optional. Whether or not the email should be in HTML-format. Defaults to true.
-	 * @param type $value 
+	 * @param boolean $value 
 	 */
 	public function setAutoResponderHtml($value) { $this->_autoResponderHtml = self::forceBool($value); }
 	/**
 	 * Auto Responder - An email to set as the reply-to.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderReplyTo($value) { $this->_autoResponderReplyTo = $value; }
 	/**
 	 * Auto Responder - Optional. The name for the Reply-To field.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderReplyToName($value) { $this->_autoResponderReplyToName = $value; }
 	/**
 	 * Auto Responder - Optional. A comma-separated list of emails to send via cc.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderCC($value) { $this->_autoResponderCC = $value; }
 	/**
 	 * Auto Responder - Optional. A comma-separated list of names to pair with the fiarCC values.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderCCName($value) { $this->_autoResponderCCName = $value; }
 	/**
 	 * Auto Responder - Optional. A comma-separated list of emails to send via bcc.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderBCC($value) { $this->_autoResponderBCC = $value; }
 	/**
 	 * Auto Responder - Optional. A comma-separated list of names to pair with the fiarBCC values.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderBCCName($value) { $this->_autoResponderBCCName = $value; }
 	/**
 	 * Auto Responder - Sets the email content.
-	 * @param type $value 
+	 * @param string $value 
 	 */
 	public function setAutoResponderEmailContent($value) { $this->_autoResponderEmailContent = $value; }
-    
+    /**
+	 * Adds a single element object to the main FormItBuilder object.
+	 * @param FormItBuilder_baseElement $o_formElement 
+	 */
 	public function addElement(FormItBuilder_baseElement $o_formElement){
 		$this->_formElements[]=$o_formElement;
 	}
+    /**
+	 * Adds multiple element objects to the main FormItBuilder object.
+	 * @param FormItBuilder_baseElement $o_formElement 
+	 */
 	public function addElements($a_elements){
 		foreach($a_elements as $o_formElement){
 			$this->addElement($o_formElement);
 		}
 	}
-	
+	/**
+	 * Adds the form element objects content to an XPDO table.
+	 * @param string $s_ObjName
+	 * @param array $a_mapping
+	 * @return boolean 
+	 */
 	private function addToDatabase($s_ObjName,$a_mapping){
 		//inspired by http://bobsguides.com/custom-db-tables.html
 		$fields = array();
@@ -265,9 +548,12 @@ class FormItBuilder extends FormItBuilderCore{
 			return false;
 		}
 	}
-	
+	/**
+	 * Called from the FormItBuilder_hooks snippet. Not intended to be called publically in any other way. This process should be automatic.
+	 * @param array $a_hookCommands
+	 * @return boolean
+	 */
 	public function processHooks($a_hookCommands){
-		//called from the FormItBuilder_hooks snippet. Not intended to be called publically in any other way.
 		$i_okCount=0;
 		foreach($a_hookCommands as $a_cmd){
 			$b_res=false;
@@ -294,7 +580,10 @@ class FormItBuilder extends FormItBuilderCore{
 			return false;
 		}
 	}
-	
+	/**
+	 * Gets the form value TABLE HTML content.
+	 * @return string 
+	 */
 	private function getFormTableContent(){
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
 		$bgCol1="#FFFFFF";
@@ -331,6 +620,10 @@ class FormItBuilder extends FormItBuilderCore{
 		$s_ret.='</table>'.$NL;
 		return $s_ret;
 	}
+	/**
+	 * Gets the Auto Responder email content.
+	 * @return string 
+	 */
 	private function autoResponderEmailStr(){
 		$NL="\r\n";
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
@@ -341,7 +634,10 @@ class FormItBuilder extends FormItBuilderCore{
 		$s_ret='<div style="'.$s_style.'">'.$NL.$s_emailContent.$NL.'</div>';
 		return $s_ret;
 	}
-	
+	/**
+	 * Gets the strink used for the post hook (email content).
+	 * @return string 
+	 */
 	private function getPostHookString(){
 		$NL="\r\n";
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
@@ -360,19 +656,41 @@ class FormItBuilder extends FormItBuilderCore{
 		
 		return $s_ret;
 	}
+	/**
+	 * Other hooks call this method which sets placeholder content for email and autoresponder template chunks.
+	 * @param hook $hook Reference to the formIt hook object.
+	 * @param FormItBuilder $formObj Reference to the FormItBuilder form object.
+	 * @return boolean 
+	 */
 	public function processCoreHook(&$hook,&$formObj){
 		$hook->setValue('FormItBuilderEmailTpl',$formObj->postHook());
 		//$this->modx->setPlaceholder('FormItBuilderAutoResponderEmailTpl','asfsafa');
 		$hook->setValue('FormItBuilderAutoResponderEmailTpl',$formObj->autoResponderEmailStr());
 		return true;
 	}
+	/**
+	 * SOON TO BE MADE PRIVATE - SHOULD CALL processCoreHook method instead.
+	 * Gets the post hook email template chunk string.
+	 * @return string 
+	 */
 	public function postHook(){
 		return $this->getPostHookString();
 	}
+	/**
+	 * FOR DEBUGGING ONLY - Gets the post hook string and echos it out followed by a hard exit. This allows users to see the raw FormIt syntax to ensure the source is written as expected.
+	 */
 	public function postHookRaw(){
 		echo $this->getPostHookString();
 		exit();
 	}
+	/**
+	 * Processes the fields into jQueryValidate output
+	 * @param string $jqFieldProps
+	 * @param string $jqFieldMessages
+	 * @param string $jqFormRules
+	 * @param string $jqFormMessages
+	 * @return string 
+	 */
 	private function jqueryValidateJSON($jqFieldProps,$jqFieldMessages,$jqFormRules,$jqFormMessages){
 		$a_ruleSegs = array();
 		$a_msgSegs = array();
@@ -393,7 +711,10 @@ class FormItBuilder extends FormItBuilderCore{
 		
 		return $s_js;
 	}
-	
+	/**
+	 * Constructs the FormItBuilder source. This is the main processing function.
+	 * @return string
+	 */
 	private function getFormItBuilderOutput(){
 		$s_submitVar = 'submitVar_'.$this->_id;
 		$s_recaptchaJS='';
@@ -575,11 +896,7 @@ class FormItBuilder extends FormItBuilderCore{
 		$s_form.=$nl.'</div>';
 
 		//wrap form elements in form tags
-		$s_formTitle='';
-		if(empty($this->_formTitle)===false){
-			$s_formTitle = ' title="'.$this->_formTitle.'"';
-		}
-		$s_form='<form action="[[~[[*id]]]]"'.$s_formTitle.' method="'.htmlspecialchars($this->_method).'"'.($b_attachmentIncluded?' enctype="multipart/form-data"':'').' class="form" id="'.htmlspecialchars($this->_id).'">'.$nl
+		$s_form='<form action="[[~[[*id]]]]" method="'.htmlspecialchars($this->_method).'"'.($b_attachmentIncluded?' enctype="multipart/form-data"':'').' class="form" id="'.htmlspecialchars($this->_id).'">'.$nl
 		.$s_form.$nl
 		.'</form>';
 		
@@ -651,7 +968,7 @@ class FormItBuilder extends FormItBuilderCore{
 		.$nl.'&emailSubject=`'.$this->_emailSubject.'`'
 		.$nl.'&emailUseFieldForSubject=`1`'
 		.$nl.'&redirectTo=`'.$this->_redirectDocument.'`'
-		.$nl.'&store=`'.$this->_store.'`'
+		.$nl.'&store=`'.($this->_store===true?'1':'0').'`'
 		.$nl.'&submitVar=`'.$s_submitVar.'`'
 		.$nl.implode($nl,$a_formItErrorMessage)
 		.$nl.'&validate=`'.(isset($this->_validate)?$this->_validate.',':'').implode(','.$nl.' ',$a_formItCmds).','.$nl.'`]]'.$nl;
@@ -753,13 +1070,19 @@ $this->jqueryValidateJSON(
 </script>';
 		}
 	}
-
+	/**
+	 * Output the FormItBuilder source.
+	 * @return type 
+	 */
 	public function output(){
 		return $this->getFormItBuilderOutput();
 	}
-	
+	/**
+	 * FOR DEBUGGING ONLY - Gets the FormItBuilder output source and prints to screen. Following this a hard exit is called. This allows users to see the raw FormIt syntax to ensure the source is written as expected.
+	 */
 	public function outputRaw(){
-		echo $this->getFormItBuilderOutput(); exit();
+		echo $this->getFormItBuilderOutput();
+		exit();
 	}
 }
 ?>

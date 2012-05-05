@@ -1,10 +1,21 @@
 <?php
+/**
+ * Contains methods that can be used from any part of FormItBuilder.
+ * @package FormItBuilder
+ */
+
+/**
+ * Required Files
+ */
 require_once 'FormElement.class.php';
 require_once 'FormItBuilder.class.php';
 require_once 'FormRule.class.php';
+
 /**
- * The core class for FormItBuilder every other class extends this class which allows easy access to the common static methods.
- */
+* The core class for FormItBuilder every other class extends this class which allows easy access to the common static methods.
+* @access private
+* @package FormItBuilder
+*/
 class FormItBuilderCore{
 	
 	/**
