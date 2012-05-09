@@ -1,5 +1,6 @@
 <?php
 /**
+ * Contains rule processor class.
  * @package FormItBuilder
  */
 
@@ -13,22 +14,56 @@ require_once 'FormRuleType.class.php';
  * @package FormItBuilder
  */
 class FormRule extends FormItBuilderCore{
+	/**
+	 * @ignore
+	 */
 	private $_type;
+	/**
+	 * @ignore
+	 */
 	private $_element;
+	/**
+	 * @ignore
+	 */
 	private $_value;
+	/**
+	 * @ignore
+	 */
 	private $_validationMessage;
-	
+	/**
+	 * Returns the rule type (should match a FormRuleType constant).
+	 * @return string 
+	 */
 	public function getType() { return $this->_type; }
+	/**
+	 * Returns a reference to the element object .
+	 * @return object
+	 */
 	public function getElement() { return $this->_element; }
+	/**
+	 * Returns rule value.
+	 * @return string
+	 */
 	public function getValue() { return $this->_value; }
+	/**
+	 * Returns the rule validation message.
+	 * @return string 
+	 */
 	public function getValidationMessage() { return $this->_validationMessage; }
-	
+	/**
+	 * Sets the validation message to be used if the rule fails validation.
+	 * @param string $value 
+	 */
 	public function setValidationMessage($value) { $this->_validationMessage = $value; }
 	
 	/**
+	 * FormRule
+	 * 
 	 * Form Rule constructor
 	 * @param string $type Recommend using FormRule constant to determine rule types
-	 * @param mixed $elements A single form element or an array of form elements
+	 * @param mixed $element A single form element or an array of form elements
+	 * @param mixed $value Some elements may set a value (e.g. a maximum width of 5 would use the value 5).
+	 * @param string $validationMessage A validation message to be used if the rule fails validation.
 	 */
 	function __construct($type, $element, $value=NULL, $validationMessage=NULL ) {
 		//verify we have a single form element or an array of them

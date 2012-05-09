@@ -1,9 +1,12 @@
 <?php
 /**
+ * Contains RuleType constants.
  * @package FormItBuilder
  */
 
 /**
+ * FormRuleType
+ * 
  * A simple class to define strings as constants for rule types to make them more easily read.
  * @package FormItBuilder
  */

@@ -1,5 +1,6 @@
 <?php
 /**
+ * Core methods and properties that are extended by all FormItBuilder objects.
  * @package FormItBuilder
  */
 
@@ -15,6 +16,8 @@ require_once 'FormItBuilderCore.class.php';
  */
 class FormItBuilder_customValidate extends FormItBuilderCore{
 	/**
+	 * validateElement($elID, $value, $options)
+	 * 
 	 * Validates an element in a variety of ways that are not covered by FormIT
 	 * @param string $elID Id of form element.
 	 * @param string $value String to validate
