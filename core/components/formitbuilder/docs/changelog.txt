@@ -1,9 +1,11 @@
 Changelog for FormItBuilder.
 
-FormItBuilder 1.2.1-pl
+FormItBuilder 1.3.0-pl
 ====================================
+- Added Auto Responder systems
 - Repair bug in FormRuleType::date causing issues with javascript validation. (Thanks for the report Kiel)
 - Removed default "Created by FormItBuilder" form title attribute.
+- Added a lot of documentation
 
 FormItBuilder 1.2.0-pl
 ====================================
