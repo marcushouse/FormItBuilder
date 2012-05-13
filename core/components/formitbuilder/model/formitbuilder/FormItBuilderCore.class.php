@@ -101,7 +101,7 @@ class FormItBuilderCore{
 	/**
 	 * Test if a string is a valid date against the specified format and return useful information about the date (such as a unix timestamp and processed version of the same date).
 	 * @param string $value String to check for valid date format
-	 * @param string $format Format must be a combination of dd mm yyyy in any order with a single character separator (default mm/dd/yyyy)
+	 * @param string $format Format can be a combination of dd mm yyyy in any order with a single character separator (default mm/dd/yyyy), or also just the year (yyyy)
 	 * @return array Returns an array of elements containing return status (Boolean status), processed date (String value) and timestamp (number) 
 	 * @ignore
 	 */
@@ -110,31 +110,40 @@ class FormItBuilderCore{
 		$s_retValue='';
 		$n_retTimestamp=0;
 		if(strlen($value)==strlen($format)){
-			// find separator. Remove all other characters from $format 
-			$separator_only = str_replace(array('m','d','y'),'', $format); 
-			$separator = $separator_only[0]; // separator is first character 
-			if($separator && strlen($separator_only) == 2){
-				
-				$newStr = $format;
-				
-				$dayPos = strpos($format,'dd');
-				$day = substr($value,$dayPos,2);
-				$newStr=str_replace('dd',$day, $newStr);
-				
-				$monthPos = strpos($format,'mm');
-				$month = substr($value,$monthPos,2);
-				$newStr=str_replace('mm',$month, $newStr);
-				
-				$yearPos = strpos($format,'yyyy');
-				$year = substr($value,$yearPos,4);
-				$newStr=str_replace('yyyy',$year, $newStr);
-				
-				if(@checkdate($month, $day, $year)){
+			if($format=="yyyy"){
+				//allow just yyyy
+				if(@checkdate(1, 1, $value)){
 					$b_retStatus=true;
-					$s_retValue=$newStr;
-					$n_retTimestamp=strtotime($year.'-'.$month.'-'.$year);
+					$s_retValue=$value;
+					$n_retTimestamp=strtotime($year.'-01-01');
 				}
-			} 
+			}else{
+				// find separator. Remove all other characters from $format 
+				$separator_only = str_replace(array('m','d','y'),'', $format); 
+				$separator = $separator_only[0]; // separator is first character 
+				if($separator && strlen($separator_only) == 2){
+
+					$newStr = $format;
+
+					$dayPos = strpos($format,'dd');
+					$day = substr($value,$dayPos,2);
+					$newStr=str_replace('dd',$day, $newStr);
+
+					$monthPos = strpos($format,'mm');
+					$month = substr($value,$monthPos,2);
+					$newStr=str_replace('mm',$month, $newStr);
+
+					$yearPos = strpos($format,'yyyy');
+					$year = substr($value,$yearPos,4);
+					$newStr=str_replace('yyyy',$year, $newStr);
+
+					if(@checkdate($month, $day, $year)){
+						$b_retStatus=true;
+						$s_retValue=$newStr;
+						$n_retTimestamp=strtotime($year.'-'.$month.'-'.$year);
+					}
+				} 
+			}
 		}
 		return array('status'=>$b_retStatus,'value'=>$s_retValue,'timestamp'=>$n_retTimestamp);
 	} 

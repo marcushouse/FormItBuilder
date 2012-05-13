@@ -1,5 +1,11 @@
 Changelog for FormItBuilder.
 
+FormItBuilder 1.3.2-pl
+====================================
+- Added ability to supply "yyyy" in the FormRuleType::date to check a valid year
+- Added a custom minimum length rule instead of using the FormIt one (FormIt would not allow and empty field that had a minimum length). Users frequently want a non required field with a minumum length.
+- Added new FormItBuilder_elementDate element that allows date selection via a series of three dropdowns for date/month/year.
+
 FormItBuilder 1.3.0-pl
 ====================================
 - Added Auto Responder systems

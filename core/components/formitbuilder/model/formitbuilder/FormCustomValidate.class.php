@@ -28,7 +28,7 @@ class FormItBuilder_customValidate extends FormItBuilderCore{
 		if(isset($GLOBALS['FormItBuilder_customValidateProcessedIds'])===false){
 			$GLOBALS['FormItBuilder_customValidateProcessedIds']=array();
 		}
-		if(in_array($elID, $GLOBALS['FormItBuilder_customValidateProcessedIds'])===true || empty($value)===true){
+		if(in_array($elID, $GLOBALS['FormItBuilder_customValidateProcessedIds'])===true){
 			return array('returnStatus'=>true,'errorMsg'=>NULL,'value'=>NULL,'extraInfo'=>NULL);
 		}else{			
 			$GLOBALS['FormItBuilder_customValidateProcessedIds'][]=$elID;
@@ -38,6 +38,22 @@ class FormItBuilder_customValidate extends FormItBuilderCore{
 			$returnExtraInfo=NULL;
 			foreach($options as $option){
 				switch($option['type']){
+					case 'elementDate':
+						if(strlen($value)=='required'){
+							if(empty($_POST[$elID.'_0'])===false && empty($_POST[$elID.'_1'])===false && empty($_POST[$elID.'_2'])===false){
+								//all three date elements must be selected
+							}else{
+								$returnStatus = false;
+								$errorMsgs[] = $option['errorMessage'];
+							}
+						}
+						break;
+					case 'textfield':
+						if(strlen($value)<$option['minLength']){
+							$returnStatus = false;
+							$errorMsgs[] = $option['errorMessage'];
+						}
+						break;
 					case 'date':
 						$a_formatInfo = FormItBuilder::is_valid_date($value, $option['fieldFormat']);
 						$returnStatus = $a_formatInfo['status'];

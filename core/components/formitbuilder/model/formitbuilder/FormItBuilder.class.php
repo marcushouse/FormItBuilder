@@ -888,13 +888,17 @@ class FormItBuilder extends FormItBuilderCore{
 
 					$elType=get_class($o_el);
 					$elId = $o_el->getId();
-					$s_val='[[+'.htmlspecialchars($o_el->getId()).':nl2br]]';
+					
 					if($elType=='FormItBuilder_elementFile'){
 						if(isset($_FILES[$elId])){
 							if($_FILES[$elId]['size']==0){
 								$s_val='None';
 							}
 						}
+					}else if($elType=='FormItBuilder_elementDate'){
+						$s_val='[[+'.htmlspecialchars($o_el->getId()).'_0]] [[+'.htmlspecialchars($o_el->getId()).'_1]] [[+'.htmlspecialchars($o_el->getId()).'_2]]';
+					}else{
+						$s_val='[[+'.htmlspecialchars($o_el->getId()).':nl2br]]';
 					}
 					
 					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlspecialchars($o_el->getLabel()).':</b></td><td>'.$s_val.'</td></tr>'.$NL;
@@ -1067,70 +1071,78 @@ class FormItBuilder extends FormItBuilderCore{
 				$a_formProps_custValidate[$elId]=array();
 			}
 			
-			
+			$s_validationMessage=$rule->getValidationMessage();
 			switch($rule->getType()){
 				case FormRuleType::email:
 					$a_fieldProps[$elId][] = 'email';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextEmailInvalid=`'.$s_validationMessage.'`';
 					$a_fieldProps_jqValidate[$elName][] = 'email:true';
-					$a_fieldProps_errstringFormIt[$elId][] = 'vTextEmailInvalid=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elName][] = 'email:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps_errstringJq[$elName][] = 'email:"'.$s_validationMessage.'"';
 					break;
 				case FormRuleType::fieldMatch:
 					$a_fieldProps[$elId][] = 'password_confirm=^'.$o_elFull[1]->getId().'^';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextPasswordConfirm=`'.$s_validationMessage.'`';
 					$a_fieldProps_jqValidate[$elName][] = 'equalTo:"#'.$o_elFull[1]->getId().'"';
-					$a_fieldProps_errstringFormIt[$elId][] = 'vTextPasswordConfirm=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elName][] = 'equalTo:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps_errstringJq[$elName][] = 'equalTo:"'.$s_validationMessage.'"';
 					break;
 				case FormRuleType::maximumLength:
 					if(is_a($o_el, 'FormItBuilder_elementCheckboxGroup')){
-						$a_formProps_custValidate[$elId][]=array('type'=>'checkboxGroup','maxLength'=>$rule->getValue(),'errorMessage'=>$rule->getValidationMessage());
+						$a_formProps_custValidate[$elId][]=array('type'=>'checkboxGroup','maxLength'=>$rule->getValue(),'errorMessage'=>$s_validationMessage);
 						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
 					}else{
 						$a_fieldProps[$elId][] = 'maxLength=^'.$rule->getValue().'^';
+						$a_fieldProps_errstringFormIt[$elId][] = 'vTextMaxLength=`'.$s_validationMessage.'`';
 					}
 					$a_fieldProps_jqValidate[$elName][] = 'maxlength:'.$rule->getValue();
-					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMaxLength=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elName][] = 'maxlength:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps_errstringJq[$elName][] = 'maxlength:"'.$s_validationMessage.'"';
 					break;
 				case FormRuleType::maximumValue:
 					$a_fieldProps[$elId][] = 'maxValue=^'.$rule->getValue().'^';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMaxValue=`'.$s_validationMessage.'`';
 					$a_fieldProps_jqValidate[$elName][] = 'max:'.$rule->getValue();
-					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMaxValue=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elName][] = 'max:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps_errstringJq[$elName][] = 'max:"'.$s_validationMessage.'"';
 					break;
 				case FormRuleType::minimumLength:
 					if(is_a($o_el, 'FormItBuilder_elementCheckboxGroup')){
-						$a_formProps_custValidate[$elId][]=array('type'=>'checkboxGroup','minLength'=>$rule->getValue(),'errorMessage'=>$rule->getValidationMessage());
+						$a_formProps_custValidate[$elId][]=array('type'=>'checkboxGroup','minLength'=>$rule->getValue(),'errorMessage'=>$s_validationMessage);
 						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
 					}else{
-						$a_fieldProps[$elId][] = 'minLength=^'.$rule->getValue().'^';
+						$a_formProps_custValidate[$elId][]=array('type'=>'textfield','minLength'=>$rule->getValue(),'errorMessage'=>$s_validationMessage);
+						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
 					}
+					//Made own validation rule cause FormIt doesnt behave with required.
+					//$a_fieldProps_errstringFormIt[$elId][] = 'vTextMinLength=`'.$s_validationMessage.'`';
 					$a_fieldProps_jqValidate[$elName][] = 'minlength:'.$rule->getValue();
-					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMinLength=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elName][] = 'minlength:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps_errstringJq[$elName][] = 'minlength:"'.$s_validationMessage.'"';
 					break;
 				case FormRuleType::minimumValue:
 					$a_fieldProps[$elId][] = 'minValue=^'.$rule->getValue().'^';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMinValue=`'.$s_validationMessage.'`';
 					$a_fieldProps_jqValidate[$elName][] = 'min:'.$rule->getValue();
-					$a_fieldProps_errstringFormIt[$elId][] = 'vTextMinValue=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elName][] = 'min:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps_errstringJq[$elName][] = 'min:"'.$s_validationMessage.'"';
 					break;
 				case FormRuleType::numeric:
 					$a_fieldProps[$elId][] = 'isNumber';
+					$a_fieldProps_errstringFormIt[$elId][] = 'vTextIsNumber=`'.$s_validationMessage.'`';
 					$a_fieldProps_jqValidate[$elName][] = 'digits:true';
-					$a_fieldProps_errstringFormIt[$elId][] = 'vTextIsNumber=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elName][] = 'digits:"'.$rule->getValidationMessage().'"';
+					$a_fieldProps_errstringJq[$elName][] = 'digits:"'.$s_validationMessage.'"';
 					break;
 				case FormRuleType::required:
-					$a_fieldProps[$elId][] = 'required';
-					$a_fieldProps_jqValidate[$elName][] = 'required:true';
-					$a_fieldProps_errstringFormIt[$elId][] = 'vTextRequired=`'.$rule->getValidationMessage().'`';
-					$a_fieldProps_errstringJq[$elName][] = 'required:"'.$rule->getValidationMessage().'"';
+					if(is_a($o_el, 'FormItBuilder_elementDate')){
+						$a_formProps_custValidate[$elId][]=array('type'=>'elementDate','required'=>true,'errorMessage'=>$s_validationMessage);
+						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
+						$a_fieldProps_jqValidate[$elName.'_0'][] = 'required:true,dateElementRequired:true';
+						$a_fieldProps_errstringJq[$elName.'_0'][] = 'required:"'.$s_validationMessage.'",dateElementRequired:"'.$s_validationMessage.'"';
+					}else{
+						$a_fieldProps[$elId][] = 'required';
+						$a_fieldProps_errstringFormIt[$elId][] = 'vTextRequired=`'.$s_validationMessage.'`';
+						$a_fieldProps_jqValidate[$elName][] = 'required:true';
+						$a_fieldProps_errstringJq[$elName][] = 'required:"'.$s_validationMessage.'"';
+					}
 					break;
 				case FormRuleType::date:
 					$s_thisVal = $rule->getValue();
-					$s_thisErrorMsg = str_replace('===dateformat===',$s_thisVal,$rule->getValidationMessage());
-					
+					$s_thisErrorMsg = str_replace('===dateformat===',$s_thisVal,$s_validationMessage);
 					$a_formProps_custValidate[$elId][]=array('type'=>'date','fieldFormat'=>$s_thisVal,'errorMessage'=>$s_thisErrorMsg);
 					$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
 					$a_fieldProps_jqValidate[$elName][] = 'dateFormat:\''.$s_thisVal.'\'';
@@ -1138,7 +1150,7 @@ class FormItBuilder extends FormItBuilderCore{
 					break;
 			}
 		}
-		//if some custom validation optiosn were found (date etc) then add formItBuilder custom validate snippet to the list
+		//if some custom validation options were found (date etc) then add formItBuilder custom validate snippet to the list
 		if(count($a_formProps_custValidate)>0){
 			$GLOBALS['FormItBuilder_customValidation']=$a_formProps_custValidate;
 			if(empty($this->_customValidators)===false){
@@ -1169,6 +1181,7 @@ class FormItBuilder extends FormItBuilderCore{
 				if(
 					is_a($o_el,'FormItBuilder_elementRadioGroup')===true
 					|| is_a($o_el,'FormItBuilder_elementCheckboxGroup')===true
+					|| is_a($o_el,'FormItBuilder_elementDate')===true
 				){
 					$forId=$o_el->getId().'_0';
 				}
@@ -1286,44 +1299,63 @@ jQuery.validator.addMethod("dateFormat", function(value, element, format) {
 	var n_retTimestamp=0;
 	if(value.length==format.length){
 		var separator_only = format;
-		separator_only = separator_only.replace(/m|d|y/g,"");
-		var separator = separator_only.charAt(0)
-
-		if(separator && separator_only.length==2){
-			var dayPos; var day; var monthPos; var month; var yearPos; var year;
-			var s_testYear;
-			var newStr = format;
-			
-			dayPos = format.indexOf("dd");
-			day = parseInt(value.substr(dayPos,2),10)+"";
-			if(day.length==1){day="0"+day;}
-			newStr=newStr.replace("dd",day);
-
-			monthPos = format.indexOf("mm");
-			month = parseInt(value.substr(monthPos,2),10)+"";
-			if(month.length==1){month="0"+month;}
-			newStr=newStr.replace("mm",month);
-
-			yearPos = format.indexOf("yyyy");
-			year = parseInt(value.substr(yearPos,4),10);
-			newStr=newStr.replace("yyyy",year);
-			
-			var testDate = new Date(year, month-1, day);
-			
-			var testDateDay=(testDate.getDate())+"";
-			if(testDateDay.length==1){testDateDay="0"+testDateDay;}
-			
-			var testDateMonth=(testDate.getMonth()+1)+"";
-			if(testDateMonth.length==1){testDateMonth="0"+testDateMonth;}
-			
-			if (testDateDay==day && testDateMonth==month && testDate.getFullYear()==year) {
-				b_retStatus = true;
-				$(element).val(newStr);
+		var testDate;
+		if(format.toLowerCase()=="yyyy"){
+			//allow just yyyy
+			testDate = new Date(value, 1, 1);
+			if(testDate.getFullYear()==value){
+				b_retStatus=true;
 			}
-		} 
+		}else{
+			separator_only = separator_only.replace(/m|d|y/g,"");
+			var separator = separator_only.charAt(0)
+
+			if(separator && separator_only.length==2){
+				var dayPos; var day; var monthPos; var month; var yearPos; var year;
+				var s_testYear;
+				var newStr = format;
+
+				dayPos = format.indexOf("dd");
+				day = parseInt(value.substr(dayPos,2),10)+"";
+				if(day.length==1){day="0"+day;}
+				newStr=newStr.replace("dd",day);
+
+				monthPos = format.indexOf("mm");
+				month = parseInt(value.substr(monthPos,2),10)+"";
+				if(month.length==1){month="0"+month;}
+				newStr=newStr.replace("mm",month);
+
+				yearPos = format.indexOf("yyyy");
+				year = parseInt(value.substr(yearPos,4),10);
+				newStr=newStr.replace("yyyy",year);
+
+				testDate = new Date(year, month-1, day);
+
+				var testDateDay=(testDate.getDate())+"";
+				if(testDateDay.length==1){testDateDay="0"+testDateDay;}
+
+				var testDateMonth=(testDate.getMonth()+1)+"";
+				if(testDateMonth.length==1){testDateMonth="0"+testDateMonth;}
+
+				if (testDateDay==day && testDateMonth==month && testDate.getFullYear()==year) {
+					b_retStatus = true;
+					$(element).val(newStr);
+				}
+			}
+		}
 	}
 	return this.optional(element) || b_retStatus;
 }, "Please enter a valid date.");
+
+jQuery.validator.addMethod("dateElementRequired", function(value, element, format) {
+	var el=element;
+	b_retStatus=true;
+	var elBaseId=element.id.substr(0,element.id.length-2);
+	if($("#"+elBaseId+"_0").val()=="" || $("#"+elBaseId+"_1").val()=="" || $("#"+elBaseId+"_2").val()==""){
+		b_retStatus=false;
+	}
+	return this.optional(element) || b_retStatus;
+}, "Date element is required.");
 
 //Main validate call
 var thisFormEl=$("#'.$this->_id.'");
