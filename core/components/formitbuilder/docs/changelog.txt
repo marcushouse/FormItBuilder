@@ -12,6 +12,7 @@ FormItBuilder 1.3.2-pl
 - In checkbox you can now supply a value such as "Checked", "Agree" as well as boolean true to have the checkbox checked by default. e.g. new FormItBuilder_elementCheckbox('agree_terms','I agree terms', 'Agree', 'Disagree', 'Agree');
 - Now FormItBuilder will pass "0" as valid. Had to make an inbuilt custom validator for the required rule. This is because MANY people want "0" to pass validation. FormIT does not allow "0" to pass.
 - Added the ability to output labels after the elements by using the new setLabelAfterElement(true) method on each element. Although CSS can position one in from of the other it can cause extra frustration when trying to align elements in a variety of ways. By setting this property to true you can force an element to output the label after the element. 
+- Made file field not output row in email table by default.
 
 FormItBuilder 1.3.0-pl
 ====================================
