@@ -216,7 +216,7 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	/**
 	 * setLabelAfterElement($value)
 	 * 
-	 * By default all labels are output before the element itself. Although CSS can position one in from of the other it can cause extra frustration when trying to align elements ina  variety of ways. By setting this property to true you can force an element to output the lable after the element.
+	 * By default all labels are output before the element itself. Although CSS can position one in from of the other it can cause extra frustration when trying to align elements in a variety of ways. By setting this property to true you can force an element to output the lable after the element.
 	 * @param boolean $value If true label HTML will output after the element instead of before.
 	 */
 	public function setLabelAfterElement($value) { $this->_labelAfterElement = self::forceBool($value); }
@@ -1205,6 +1205,7 @@ class FormItBuilder_elementFile extends FormItBuilder_elementText{
 	function __construct( $id, $label ) {
 		parent::__construct($id,$label);
 		$this->_fieldType='file';
+		$this->_showInEmail=false;
 	}
 }
 
