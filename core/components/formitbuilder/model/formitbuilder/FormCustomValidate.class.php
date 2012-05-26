@@ -39,7 +39,7 @@ class FormItBuilder_customValidate extends FormItBuilderCore{
 			foreach($options as $option){
 				switch($option['type']){
 					case 'elementDate':
-						if(strlen($value)=='required'){
+						if($option['required']===true){
 							if(empty($_POST[$elID.'_0'])===false && empty($_POST[$elID.'_1'])===false && empty($_POST[$elID.'_2'])===false){
 								//all three date elements must be selected
 							}else{
@@ -49,9 +49,18 @@ class FormItBuilder_customValidate extends FormItBuilderCore{
 						}
 						break;
 					case 'textfield':
-						if(strlen($value)<$option['minLength']){
-							$returnStatus = false;
-							$errorMsgs[] = $option['errorMessage'];
+						if(isset($option['minLength'])===true){
+							if(strlen($value)<$option['minLength']){
+								$returnStatus = false;
+								$errorMsgs[] = $option['errorMessage'];
+							}
+						}else if(isset($option['required'])===true){
+							if(empty($value)===true && $value!='0'){
+								$returnStatus = false;
+								$errorMsgs[] = $option['errorMessage'];
+							}else{
+								//pass validation - put in place because FormIt will not pass a character 0
+							}
 						}
 						break;
 					case 'date':

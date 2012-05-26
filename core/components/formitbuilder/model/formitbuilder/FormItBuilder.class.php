@@ -1134,8 +1134,10 @@ class FormItBuilder extends FormItBuilderCore{
 						$a_fieldProps_jqValidate[$elName.'_0'][] = 'required:true,dateElementRequired:true';
 						$a_fieldProps_errstringJq[$elName.'_0'][] = 'required:"'.$s_validationMessage.'",dateElementRequired:"'.$s_validationMessage.'"';
 					}else{
-						$a_fieldProps[$elId][] = 'required';
-						$a_fieldProps_errstringFormIt[$elId][] = 'vTextRequired=`'.$s_validationMessage.'`';
+						$a_formProps_custValidate[$elId][]=array('type'=>'textfield','required'=>true,'errorMessage'=>$s_validationMessage);
+						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
+						//$a_fieldProps[$elId][] = 'required';
+						//$a_fieldProps_errstringFormIt[$elId][] = 'vTextRequired=`'.$s_validationMessage.'`';
 						$a_fieldProps_jqValidate[$elName][] = 'required:true';
 						$a_fieldProps_errstringJq[$elName][] = 'required:"'.$s_validationMessage.'"';
 					}
@@ -1192,20 +1194,34 @@ class FormItBuilder extends FormItBuilderCore{
 					$s_recaptchaJS=$o_el->getJsonConfig();
 				}
 				
+				$s_extraClasses='';
+				$a_exClasses=$o_el->getExtraClasses();
+				if(count($a_exClasses)>0){
+					$s_extraClasses = ' '.implode(' ',$o_el->getExtraClasses());
+				}
+				
 				$b_required = $o_el->isRequired();
-				$s_form.='<div title="'.$o_el->getLabel().'" class="formSegWrap formSegWrap_'.htmlspecialchars($o_el->getId()).' '.$s_typeClass.($b_required===true?' required':'').'">';
+				$s_form.='<div title="'.$o_el->getLabel().'" class="formSegWrap formSegWrap_'.htmlspecialchars($o_el->getId()).' '.$s_typeClass.($b_required===true?' required':'').$s_extraClasses.'">';
+					$s_labelHTML='';
 					if($o_el->showLabel()===true){
 						$s_desc=$o_el->getDescription();
 						if(empty($s_desc)===false){
 							$s_desc='<span class="description">'.$s_desc.'</span>';
 						}
-						$s_form.=$nl.'  <label class="mainElLabel"'.$s_forStr.'><span class="mainLabel">'.$o_el->getLabel().'</span>'.$s_desc.'</label>';
+						$s_labelHTML='<label class="mainElLabel"'.$s_forStr.'><span class="mainLabel">'.$o_el->getLabel().'</span>'.$s_desc.'</label>';
 					}
-					$s_form.=$nl.'  <div class="elWrap">'.$nl.'    '.$o_el->outputHTML();
+					
+					$s_element='<div class="elWrap">'.$nl.'    <span class="before"></span>'.$o_el->outputHTML().'<span class="after"></span>';
 					if($o_el->showLabel()===true){
-						$s_form.=$nl.'  <div class="errorContainer"><label class="formiterror" '.$s_forStr.'>[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
+						$s_element.='<div class="errorContainer"><label class="formiterror" '.$s_forStr.'>[[+fi.error.'.htmlspecialchars($o_el->getId()).']]</label></div>';
 					}
-					$s_form.=$nl.'  </div>';
+					$s_element.='</div>';
+					
+					if($o_el->getLabelAfterElement()===true){
+						$s_form.=$s_element.$s_labelHTML;
+					}else{
+						$s_form.=$s_labelHTML.$s_element;
+					}
 				$s_form.=$nl.'</div>'.$nl;
 			}
 		}

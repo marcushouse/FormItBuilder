@@ -15,6 +15,25 @@ require_once 'FormItBuilderCore.class.php';
  * @package FormItBuilder
  */
 class FormItBuilder_baseElement extends FormItBuilderCore{
+	/**
+	 * @ignore 
+	 */
+	private $_customObject;
+	/**
+	 * setCustomObject($value)
+	 * 
+	 * Not used via FormItBuilder in anyway, however lets users attach object references or data into this property and then retrive the data via script. Very much a power user feature.
+	 * @param mixed $value Can set anything here.
+	 */
+	public function setCustomObject($value) { $this->_customObject = $value; }
+	
+	/**
+	 * getCustomObject()
+	 * 
+	 * Returns the custom object.
+	 * @return mixed
+	 */
+	public function getCustomObject() { return $this->_customObject; }
 }
 
 /**
@@ -81,6 +100,14 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	 * @ignore
 	 */
 	protected $_showInEmail;
+	/**
+	 * @ignore
+	 */
+	protected $_extraClasses;
+	/**
+	 * @ignore
+	 */
+	protected $_labelAfterElement;
 
 	/**
 	 * output function called when generating the form element content.
@@ -102,6 +129,8 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 		$this->_showLabel = true;
 		$this->_showInEmail = true;
 		$this->_description = NULL; //must be set by setDescription
+		$this->_extraClasses = NULL;
+		$this->_labelAfterElement=false;
 	}
 	
 	/**
@@ -132,7 +161,22 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	 * @return string 
 	 */
 	public function getDescription() { return $this->_description; }
-    
+	/**
+	 * getExtraClasses()
+	 * 
+	 * Returns the array of extra classes applied to the element.
+	 * @return array
+	 */
+	public function getExtraClasses() { return $this->_extraClasses; }
+	/**
+	 * getLabelAfterElement()
+	 * 
+	 * Returns a boolean indicating if an element will output label HTML before (false) or after (true) the element.
+	 * @return boolean
+	 */
+	public function getLabelAfterElement() { return $this->_labelAfterElement; }
+	
+	
 	/**
 	 * setId($value)
 	 * 
@@ -161,6 +205,22 @@ abstract class FormItBuilder_element extends FormItBuilder_baseElement{
 	 * @param string $value 
 	 */
 	public function setDescription($value) { $this->_description = $value; }
+	/**
+	 * setExtraClasses($value)
+	 * 
+	 * Allows you to add your own classes on the wrapper element so you can apply specific CSS commands to one or more fields.
+	 * @param array $value An array of class strings.
+	 */
+	public function setExtraClasses($value) { $this->_extraClasses = self::forceArray($value); }
+	
+	/**
+	 * setLabelAfterElement($value)
+	 * 
+	 * By default all labels are output before the element itself. Although CSS can position one in from of the other it can cause extra frustration when trying to align elements ina  variety of ways. By setting this property to true you can force an element to output the lable after the element.
+	 * @param boolean $value If true label HTML will output after the element instead of before.
+	 */
+	public function setLabelAfterElement($value) { $this->_labelAfterElement = self::forceBool($value); }
+	
         
 	/**
 	 * showLabel($value) / showLabel()
@@ -334,7 +394,8 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 					$selectedStr=' selected="selected"';
 				}
 			}
-			$s_ret.='<option value="'.htmlspecialchars($key).'"'.$selectedStr.'>'.htmlspecialchars($value).'</option>'."\r\n";
+			//trims here so we can force space
+			$s_ret.='<option value="'.htmlspecialchars(trim($key)).'"'.$selectedStr.'>'.htmlspecialchars($value).'</option>'."\r\n";
 		}
 		$s_ret.='</select>';
 		return $s_ret;
@@ -605,7 +666,7 @@ class FormItBuilder_elementDate extends FormItBuilder_element{
 			FormItBuilder::throwError('[Element: '.$this->_id.'] Date start "'.$this->_yearStart.'" is greater than the end year "'.$this->_yearEnd.'".');
 		}
 		for($a=$this->_yearStart;$a<$this->_yearEnd+1;$a++){
-			$a_years[$a.' ']=$a; //blank space here to be a number instead of an index
+			$a_years[' '.$a]=$a; //blank space here to be a number instead of an index
 		}
 		$a_years['']='';
 		$a_years=array_reverse($a_years);
@@ -710,13 +771,13 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 	 * @param string $label Label of checkbox
 	 * @param string $value Value to show if user selects the checkbox
 	 * @param boolean $uncheckedValue Value to show if user does not check the checkbox
-	 * @param boolean $checked Make checkbox ticked by default
+	 * @param mixed $checked The checkbox will be checked by default if true is supplied OR if the checked value is supplied. e.g. if checked value is "Agree" and this parameter is set to "Agree" the checkbox will be checked by default.
 	 */
 	function __construct( $id, $label, $value='Checked', $uncheckedValue='Unchecked', $checked=false) {
 		parent::__construct($id,$label);
 		$this->_value=$value;
 		$this->_checked=$checked;
-		$this->_uncheckedValue=$uncheckedValue;		
+		$this->_uncheckedValue=$uncheckedValue;
 	}
 	/**
 	 * outputHTML()
@@ -729,9 +790,18 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 		if($this->_required===true){
 			$a_uncheckedVal=''; // we do this because FormIt will not validate it as empty if unchecked value has a value.
 		}
+		if(isset($_POST[$this->_id])===true){
+			if($_POST[$this->_id]==$this->_value){
+				$selectedStr=' [[!+fi.'.htmlspecialchars($this->_id).':FormItIsChecked=`'.htmlspecialchars($this->_value).'`]]';
+			}
+		}else{
+			if($this->_checked===true || $this->_value==$this->_checked){
+				$selectedStr=' checked="checked"';
+			}
+		}
 		//hidden field with same name is so we get a post value regardless of tick status
 		$s_ret='<input type="hidden" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($a_uncheckedVal).'" />'
-		.'<input type="checkbox" id="'.htmlspecialchars($this->_id).'" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($this->_value).'" [[!+fi.'.htmlspecialchars($this->_id).':FormItIsChecked=`'.htmlspecialchars($this->_value).'`]] />';
+		.'<input type="checkbox" id="'.htmlspecialchars($this->_id).'" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($this->_value).'"'.$selectedStr.' />';
 		return $s_ret;
 	}
 }
@@ -1066,7 +1136,7 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 			$selectedStr=htmlspecialchars($this->_defaultVal);
 		}
 		
-		$s_ret='<input type="'.$this->_fieldType.'" name="'.htmlspecialchars($this->_id).'" id="'.htmlspecialchars($this->_id).'" value="'.$selectedStr.'"';
+		$s_ret='<input type="'.$this->_fieldType.'" name="'.htmlspecialchars($this->_id).'" id="'.htmlspecialchars($this->_id).'"'.($this->_fieldType=='file'?'':' value="'.$selectedStr.'"');
 		if($this->_maxLength!==NULL){
 			$s_ret.=' maxlength="'.htmlspecialchars($this->_maxLength).'"';
 		}

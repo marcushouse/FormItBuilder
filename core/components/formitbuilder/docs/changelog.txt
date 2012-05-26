@@ -5,6 +5,13 @@ FormItBuilder 1.3.2-pl
 - Added ability to supply "yyyy" in the FormRuleType::date to check a valid year
 - Added a custom minimum length rule instead of using the FormIt one (FormIt would not allow and empty field that had a minimum length). Users frequently want a non required field with a minumum length.
 - Added new FormItBuilder_elementDate element that allows date selection via a series of three dropdowns for date/month/year.
+- Added ability to add extra classes onto the element wrapper using the setExtraClasses method. e.g. $o_fe_postcode->setExtraClasses(array('tiny','numeric'));
+- Added <span class="before"></span> and <span class="after"></span> around all input elemetns to allow field prefixes and suffix labels such as a unit (meters, feet pints etc). Using the CSS command :after or :before allows text inside this spans that would normally be invisible. Could also use javascript to inject html into these areas as well.
+- Added power user ability to assign custom variables into each element for retrieval in scripts. e.g. $o_fe_minLen->setCustomObject(array('asfsaf'=>'fdhdfh','dyhsg'=>32456));
+- Fixed but in checkbox default (Setting default ticked to true did not work).
+- In checkbox you can now supply a value such as "Checked", "Agree" as well as boolean true to have the checkbox checked by default. e.g. new FormItBuilder_elementCheckbox('agree_terms','I agree terms', 'Agree', 'Disagree', 'Agree');
+- Now FormItBuilder will pass "0" as valid. Had to make an inbuilt custom validator for the required rule. This is because MANY people want "0" to pass validation. FormIT does not allow "0" to pass.
+- Added the ability to output labels after the elements by using the new setLabelAfterElement(true) method on each element. Although CSS can position one in from of the other it can cause extra frustration when trying to align elements in a variety of ways. By setting this property to true you can force an element to output the label after the element. 
 
 FormItBuilder 1.3.0-pl
 ====================================
