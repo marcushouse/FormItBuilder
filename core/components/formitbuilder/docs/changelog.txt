@@ -1,4 +1,7 @@
 Changelog for FormItBuilder.
+FormItBuilder 1.3.3-pl
+====================================
+- Small bugfix in select form element compare code.
 
 FormItBuilder 1.3.2-pl
 ====================================

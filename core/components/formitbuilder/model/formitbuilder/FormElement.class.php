@@ -390,7 +390,7 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 			if(isset($_POST[$this->_id])===true){
 				$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).':FormItIsSelected=`'.htmlspecialchars($key).'`]]';
 			}else{
-				if($this->_defaultVal===$key){
+				if($this->_defaultVal==$key){
 					$selectedStr=' selected="selected"';
 				}
 			}
