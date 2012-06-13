@@ -7,7 +7,7 @@
 /**
  * Required Files
  */
-require_once 'FormRuleType.class.php';
+require_once dirname(__FILE__).'/FormRuleType.class.php';
 
 /**
  * Contains rule methods applied to an element. The FormItBuilder object is then assigned rules using the addRules method.

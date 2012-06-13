@@ -7,7 +7,7 @@
 /**
  * Required Files
  */
-require_once 'FormItBuilderCore.class.php';
+require_once dirname(__FILE__).'/FormItBuilderCore.class.php';
 
 
 /**

@@ -7,7 +7,7 @@
 /**
  * Required Files
  */
-require_once 'FormItBuilderCore.class.php';
+require_once dirname(__FILE__).'/FormItBuilderCore.class.php';
 
 /**
  * The main FormItBuilder methods. Most of the program bulk lives within this class and handles a great number of set/get methods and output methods.
