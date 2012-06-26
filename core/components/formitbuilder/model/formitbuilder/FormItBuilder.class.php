@@ -33,6 +33,10 @@ class FormItBuilder extends FormItBuilderCore{
 	/**
 	 * @ignore 
 	 */
+	private $_redirectParams;
+	/**
+	 * @ignore 
+	 */
 	private $_hooks;
 	/**
 	 * @ignore 
@@ -208,6 +212,7 @@ class FormItBuilder extends FormItBuilderCore{
 		$this->_formElements=array();
 		$this->_rules=array();
 		$this->_redirectDocument=$this->modx->resource->get('id');
+		$this->_redirectParams=NULL;
 		$this->_jqueryValidation=false;
 		$this->_emailTpl='FormItBuilderEmailTpl';
 		$this->_autoResponderTpl='FormItBuilderAutoResponderEmailTpl';
@@ -269,6 +274,15 @@ class FormItBuilder extends FormItBuilderCore{
 	 * @return string
 	 */
 	public function getRedirectDocument() { return $this->_redirectDocument; } 
+	
+	/**
+	 * getRedirectParams()
+	 * 
+	 * Returns the forms redirectDocument parameters.
+	 * @return string
+	 */
+	public function getRedirectParams() { return $this->_redirectParams; } 
+	
 	/**
 	 * getJqueryValidation()
 	 * 
@@ -514,6 +528,13 @@ class FormItBuilder extends FormItBuilderCore{
 	 * @param string $value The resource ID of the page to redirect to post success.
 	 */
 	public function setRedirectDocument($value) { $this->_redirectDocument = $value; } 
+	/**
+	 * setRedirectParams($value)
+	 * 
+	 * Sets the forms redirect parameters. This allows you to send arguments to a landing page. See FormIt redirect hook documentation.
+	 * @param string $value A JSON object of parameters to pass in the redirect URL. e.g. {"user":"123","success":"1"}
+	 */
+	public function setRedirectParams($value) { $this->_redirectParams = $value; } 
 	/**
 	 * setJqueryValidation($value)
 	 * 
@@ -1300,6 +1321,7 @@ class FormItBuilder extends FormItBuilderCore{
 		.$nl.'&emailSubject=`'.$this->_emailSubject.'`'
 		.$nl.'&emailUseFieldForSubject=`1`'
 		.$nl.'&redirectTo=`'.$this->_redirectDocument.'`'
+		.(empty($this->_redirectParams)===false?$nl.'&redirectParams=`'.$this->_redirectParams.'`':'')
 		.$nl.'&store=`'.($this->_store===true?'1':'0').'`'
 		.$nl.'&submitVar=`'.$s_submitVar.'`'
 		.$nl.implode($nl,$a_formItErrorMessage)
