@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/FormRule.class.php';
 class FormItBuilderCore{
 	
 	/**
-	 * Setter function. This should always be overwritten, if not throw an error (forces extending classes to define setters)
+	 * Setter function. This should always be overwritten, if not throw an error (forces extending classes to define setters).
 	 * @param string $name Name of the property
 	 * @param string $value Value of the property
 	 * @ignore
