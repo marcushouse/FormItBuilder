@@ -1229,7 +1229,7 @@ class FormItBuilder extends FormItBuilderCore{
 						if(empty($s_desc)===false){
 							$s_desc='<span class="description">'.$s_desc.'</span>';
 						}
-						$s_labelHTML='<label class="mainElLabel"'.$s_forStr.'><span class="mainLabel">'.$o_el->getLabel().'</span>'.$s_desc.'</label>';
+						$s_labelHTML='<label class="mainElLabel"'.$s_forStr.'><span class="before"></span><span class="mainLabel">'.$o_el->getLabel().'</span>'.$s_desc.'<span class="after"></span></label>';
 					}
 					
 					$s_element='<div class="elWrap">'.$nl.'    <span class="before"></span>'.$o_el->outputHTML().'<span class="after"></span>';
