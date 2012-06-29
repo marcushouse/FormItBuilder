@@ -559,6 +559,9 @@ class FormItBuilder_elementDate extends FormItBuilder_element{
 	private $_dateFormat;
 	private $_yearStart;
 	private $_yearEnd;
+	private $_defaultVal0;
+	private $_defaultVal1;
+	private $_defaultVal2;
 	
 	/**
 	 * FormItBuilder_elementDate
@@ -569,12 +572,17 @@ class FormItBuilder_elementDate extends FormItBuilder_element{
 	 * @param type $label The label of the data element.
 	 * @param type $year_start The start year to show in the year dropdown (default=current year - 90).
 	 * @param type $year_end  Then end year to show in dropdown (default=current year + 10).
+	 * @param type $defaultValue Pass in a unix timestamp to set a default date.
 	 */
-	function __construct($id, $label, $format='dd/mm/yyyy', $year_start=NULL, $year_end=NULL ){
+	function __construct($id, $label, $format='dd/mm/yyyy', $year_start=NULL, $year_end=NULL, $defaultValue=NULL ){
 		parent::__construct($id,$label);
 		$this->setDateFormat($format);
 		$this->setYearStart($year_start);
 		$this->setYearEnd($year_end);
+
+		$this->_defaultVal0 = date('jS',$defaultValue);
+		$this->_defaultVal1 = date('F',$defaultValue);
+		$this->_defaultVal2 = date('Y',$defaultValue);
 	}
 	/**
 	 * setDateFormat($value)
@@ -672,10 +680,11 @@ class FormItBuilder_elementDate extends FormItBuilder_element{
 		$a_years=array_reverse($a_years);
 		$cnt=0;
 		foreach($this->_dateFormat as $datePart){
-			if($datePart=='day'){ $selectArray=$a_days;	}
-			if($datePart=='month'){ $selectArray=$a_months;	}
-			if($datePart=='year'){ $selectArray=$a_years;	}
-			$drop = new FormItBuilder_elementSelect($this->_id.'_'.$cnt, '', $selectArray);
+			$default = NULL;
+			if($datePart=='day'){ $selectArray=$a_days;	$default=$this->_defaultVal0; }
+			if($datePart=='month'){ $selectArray=$a_months; $default=$this->_defaultVal1; }
+			if($datePart=='year'){ $selectArray=$a_years; $default=$this->_defaultVal2; }
+			$drop = new FormItBuilder_elementSelect($this->_id.'_'.$cnt, '', $selectArray, $default);
 			$s_ret.='<span class="elementDate_'.$cnt.'">'.$drop->outputHTML().'</span>';
 			$cnt++;
 		}
