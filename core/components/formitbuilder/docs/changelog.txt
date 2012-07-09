@@ -4,6 +4,8 @@ FormItBuilder 1.3.3-pl
 - Small bugfix in select form element compare code.
 - Added hidden spans before/after each main element label for extra css flexibility
 - Added methods to set / get redirectParams for the redirect FormIt hook.
+- Added $o_form->setSubmitVar('myCustomSubmitVar') to allow processing to be ignored or run only in certain conditions.
+- Replaced all inbuilt FormIt post check calls (like FormItIsSelected, FormItIsChecked and any other +fi. placeholder). Replaced with own processing (faster).
 
 FormItBuilder 1.3.2-pl
 ====================================

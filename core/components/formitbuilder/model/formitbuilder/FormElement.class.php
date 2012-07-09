@@ -388,7 +388,9 @@ class FormItBuilder_elementSelect extends FormItBuilder_element{
 		foreach($this->_values as $key=>$value){
 			$selectedStr='';
 			if(isset($_POST[$this->_id])===true){
-				$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).':FormItIsSelected=`'.htmlspecialchars($key).'`]]';
+				if($_POST[$this->_id]==$key){
+					$selectedStr=' selected="selected"';
+				}
 			}else{
 				if($this->_defaultVal==$key){
 					$selectedStr=' selected="selected"';
@@ -479,7 +481,9 @@ class FormItBuilder_elementRadioGroup extends FormItBuilder_element{
 			$s_ret.='<div class="radioEl"><input type="radio" id="'.htmlspecialchars($this->_id.'_'.$i).'" name="'.htmlspecialchars($this->_id).'" value="'.htmlspecialchars($key).'"';
 			$selectedStr='';
 			if(isset($_POST[$this->_id])===true){
-				$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).':FormItIsChecked=`'.htmlspecialchars($key).'`]]';
+				if($_POST[$this->_id]==$key){
+					$selectedStr=' checked="checked"';
+				}
 			}else{
 				if($this->_defaultVal==$key){
 					$selectedStr=' checked="checked"';
@@ -736,7 +740,7 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 	public function outputHTML(){
 		//hidden field with same name is so we get a post value regardless of tick status
 		if(isset($_POST[$this->_id])===true){
-			$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).']]';
+			$selectedStr=htmlspecialchars($_POST[$this->_id]);
 		}else{
 			$selectedStr=htmlspecialchars($this->_defaultVal);
 		}
@@ -801,7 +805,7 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 		}
 		if(isset($_POST[$this->_id])===true){
 			if($_POST[$this->_id]==$this->_value){
-				$selectedStr=' [[!+fi.'.htmlspecialchars($this->_id).':FormItIsChecked=`'.htmlspecialchars($this->_value).'`]]';
+				$selectedStr=' checked="checked"';
 			}
 		}else{
 			if($this->_checked===true || $this->_value==$this->_checked){
@@ -948,7 +952,7 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 			$selectedStr='';
 			if(isset($_POST[$this->_id])===true){
 				if(in_array($value['title'],$_POST[$this->_id])===true){
-					$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).':FormItIsChecked=`'.htmlspecialchars($value['title']).'`]]';
+					$selectedStr=' checked="checked"';
 				}
 			}else{
 				if(isset($value['checked'])===true && $value['checked']===true){
@@ -1140,7 +1144,7 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 		
 		//hidden field with same name is so we get a post value regardless of tick status
 		if(isset($_POST[$this->_id])===true){
-			$selectedStr='[[!+fi.'.htmlspecialchars($this->_id).']]';
+			$selectedStr=htmlspecialchars($_POST[$this->_id]);
 		}else{
 			$selectedStr=htmlspecialchars($this->_defaultVal);
 		}

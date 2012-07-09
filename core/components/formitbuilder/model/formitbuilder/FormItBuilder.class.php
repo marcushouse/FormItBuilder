@@ -194,6 +194,10 @@ class FormItBuilder extends FormItBuilderCore{
 	 * @ignore 
 	 */
 	private $_autoResponderEmailContent;
+	/**
+	 * @ignore 
+	 */
+	private $_submitVar;
 
 	/**
 	 * FormItBuilder
@@ -213,6 +217,7 @@ class FormItBuilder extends FormItBuilderCore{
 		$this->_rules=array();
 		$this->_redirectDocument=$this->modx->resource->get('id');
 		$this->_redirectParams=NULL;
+		$this->_submitVar=NULL;
 		$this->_jqueryValidation=false;
 		$this->_emailTpl='FormItBuilderEmailTpl';
 		$this->_autoResponderTpl='FormItBuilderAutoResponderEmailTpl';
@@ -281,8 +286,18 @@ class FormItBuilder extends FormItBuilderCore{
 	 * Returns the forms redirectDocument parameters.
 	 * @return string
 	 */
-	public function getRedirectParams() { return $this->_redirectParams; } 
+	public function getRedirectParams() { return $this->_redirectParams; }
 	
+	/**
+	 * getSubmitVar()
+	 * 
+	 * Returns any custom set submitVar. Will return NULL by default as normally this is an automated post variable.
+	 * @return string
+	 */
+	public function getSubmitVar() { return $this->_submitVar; } 
+	
+	
+			
 	/**
 	 * getJqueryValidation()
 	 * 
@@ -529,10 +544,18 @@ class FormItBuilder extends FormItBuilderCore{
 	 */
 	public function setRedirectDocument($value) { $this->_redirectDocument = $value; } 
 	/**
+	 * setSubmitVar($value)
+	 * 
+	 * Sets the submission variable. This
+	 * @param string $value A JSON object of parameters to pass in the redirect URL. e.g. {"user":"123","success":"1"}
+	 */
+	public function setSubmitVar($value) { $this->_submitVar = $value; } 
+	
+	/**
 	 * setRedirectParams($value)
 	 * 
-	 * Sets the forms redirect parameters. This allows you to send arguments to a landing page. See FormIt redirect hook documentation.
-	 * @param string $value A JSON object of parameters to pass in the redirect URL. e.g. {"user":"123","success":"1"}
+	 * If set, will not begin form processing if this POST variable is not passed. Useful to disable automatic processing. Normally this process is handled automatically.
+	 * @param string $value Required post variable before form processing will occur.
 	 */
 	public function setRedirectParams($value) { $this->_redirectParams = $value; } 
 	/**
@@ -1045,6 +1068,11 @@ class FormItBuilder extends FormItBuilderCore{
 	 */
 	private function getFormItBuilderOutput(){
 		$s_submitVar = 'submitVar_'.$this->_id;
+		$b_customSubmitVar=false;
+		if(empty($this->_submitVar)===false){
+			$s_submitVar = $this->_submitVar;
+			$b_customSubmitVar=true;
+		}
 		$s_recaptchaJS='';
 		$b_posted = false;
 		if(isset($_REQUEST[$s_submitVar])===true){
@@ -1186,7 +1214,7 @@ class FormItBuilder extends FormItBuilderCore{
 		$b_attachmentIncluded=false;
 		$s_form='<div>'.$nl
 		.$nl.'<div class="process_errors_wrap"><div class="process_errors">[[!+fi.error_message:notempty=`[[!+fi.error_message]]`]]</div></div>'
-		.$nl.'<input type="hidden" name="'.$s_submitVar.'" value="1" />'
+		.$nl.($b_customSubmitVar===false?'<input type="hidden" name="'.$s_submitVar.'" value="1" />':'')
 		.$nl.'<input type="hidden" name="fke'.date('Y').'Sp'.date('m').'Blk:blank" value="" /><!-- additional crude spam block. If this field ends up with data it will fail to submit -->'
 		.$nl;
 		foreach($this->_formElements as $o_el){
