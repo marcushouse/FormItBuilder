@@ -38,6 +38,78 @@ class FormItBuilder_customValidate extends FormItBuilderCore{
 			$returnExtraInfo=NULL;
 			foreach($options as $option){
 				switch($option['type']){
+					case 'elementMatrix_text':
+						if($option['required']===true){
+							//make sure no posted values inside grid are filled out
+							$invalCount=0;
+							$gridInfo = explode(',',$_POST[$elID.'_gridInfo']);
+							$rows=$gridInfo[0];
+							$columns=$gridInfo[1];
+							for($a=0;$a<$rows;$a++){
+								for($b=0;$b<$columns;$b++){
+									if(isset($_POST[$elID.'_'.$a.'_'.$b])===true){
+										if(trim($_POST[$elID.'_'.$a.'_'.$b])==''){
+											$invalCount++;
+										}
+									}else{
+										$invalCount++;
+									}
+								}
+							}
+							if($invalCount>0){
+								$returnStatus = false;
+								$errorMsgs[] = $option['errorMessage'];
+							}
+						}
+						break;
+					case 'elementMatrix_radio':
+						if($option['required']===true){
+							//make sure no posted values inside grid are filled out
+							$invalCount=0;
+							$gridInfo = explode(',',$_POST[$elID.'_gridInfo']);
+							$rows=$gridInfo[0];
+							$columns=$gridInfo[1];
+							for($a=0;$a<$rows;$a++){
+								if(isset($_POST[$elID.'_'.$a])===true){
+									if(trim($_POST[$elID.'_'.$a])==''){
+										$invalCount++;
+									}
+								}else{
+									$invalCount++;
+								}
+							}
+							if($invalCount>0){
+								$returnStatus = false;
+								$errorMsgs[] = $option['errorMessage'];
+							}
+						}
+						break;
+					case 'elementMatrix_check':
+						if($option['required']===true){
+							//make sure no posted values inside grid are filled out
+							$invalCount=0;
+							$gridInfo = explode(',',$_POST[$elID.'_gridInfo']);
+							$rows=$gridInfo[0];
+							$columns=$gridInfo[1];
+							for($a=0;$a<$rows;$a++){
+								$itemsInRowTicked=0;
+								for($b=0;$b<$columns;$b++){
+									if(isset($_POST[$elID.'_'.$a])===true && count($_POST[$elID.'_'.$a])>0){
+										$itemsInRowTicked++;
+									}else{
+										$invalCount++;
+									}
+								}
+								if($itemsInRowTicked==0){
+									$invalCount++;
+								}
+							}
+							if($invalCount>0){
+								$returnStatus = false;
+								$errorMsgs[] = $option['errorMessage'];
+							}
+						}
+						break;
 					case 'elementDate':
 						if($option['required']===true){
 							if(empty($_POST[$elID.'_0'])===false && empty($_POST[$elID.'_1'])===false && empty($_POST[$elID.'_2'])===false){

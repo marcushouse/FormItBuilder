@@ -915,10 +915,12 @@ class FormItBuilder extends FormItBuilderCore{
 	 */
 	private function getFormTableContent(){
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
-		$bgCol1="#FFFFFF";
-		$bgCol2="#e4edf9";
+		$bgCol1='#FFFFFF';
+		$bgCol2='#e4edf9';
+		$bgColDarkerBG='#cddaeb';
+		$colOutline='#8a99ae';
 		$rowCount=0;
-		$s_ret='<table cellpadding="4" cellspacing="0" style="'.$s_style.'">'.$NL;
+		$s_ret='<table cellpadding="5" cellspacing="0" style="'.$s_style.'">'.$NL;
 		foreach($this->_formElements as $o_el){
 			if(get_class($o_el)=='FormItBuilder_htmlBlock'){
 				//do nothing
@@ -933,16 +935,60 @@ class FormItBuilder extends FormItBuilderCore{
 					$elType=get_class($o_el);
 					$elId = $o_el->getId();
 					
-					if($elType=='FormItBuilder_elementFile'){
-						if(isset($_FILES[$elId])){
-							if($_FILES[$elId]['size']==0){
-								$s_val='None';
+					switch($elType){
+						case 'FormItBuilder_elementMatrix':
+							$type = $o_el->getType();
+							$cols = $o_el->getColumns();
+							$rows = $o_el->getRows();
+							$r_cnt=0;
+							$s_val='<table cellpadding="5" cellspacing="0" style="'.$s_style.' font-size:10px;"><tr><td>&nbsp;</td>';
+							$c_cnt=0;
+							foreach($cols as $column){
+								$s_val.='<td style="'.($c_cnt==0?'border-left:1px solid '.$colOutline.'; ':'').'background-color:'.$bgColDarkerBG.'; border-right:1px solid '.$colOutline.'; border-bottom:1px solid '.$colOutline.'; border-top:1px solid '.$colOutline.';"><em>'.htmlspecialchars($column).'</em></td>';
+								$c_cnt++;								
 							}
-						}
-					}else if($elType=='FormItBuilder_elementDate'){
-						$s_val='[[+'.htmlspecialchars($o_el->getId()).'_0]] [[+'.htmlspecialchars($o_el->getId()).'_1]] [[+'.htmlspecialchars($o_el->getId()).'_2]]';
-					}else{
-						$s_val='[[+'.htmlspecialchars($o_el->getId()).':nl2br]]';
+							$s_val.='</tr>';
+							foreach($rows as $row){
+								$c_cnt=0;
+								$s_val.='<tr><td style="'.($r_cnt==0?'border-top:1px solid '.$colOutline.'; ':'').'background-color:'.$bgColDarkerBG.'; border-right:1px solid '.$colOutline.'; border-left:1px solid '.$colOutline.'; border-bottom:1px solid '.$colOutline.';"><em>'.htmlspecialchars($row).'</em></td>';
+								foreach($cols as $column){
+									$s_val.='<td style="text-align:center; border-right:1px solid '.$colOutline.'; border-bottom:1px solid '.$colOutline.';">';
+									switch($type){
+										case 'text':
+											$s_val.=htmlspecialchars($_REQUEST[$elId.'_'.$r_cnt.'_'.$c_cnt]);
+											break;
+										case 'radio':
+											$s_val.=($c_cnt==$_REQUEST[$elId.'_'.$r_cnt]?'&#10004;':'-');
+											break;
+										case 'check':
+											if(isset($_REQUEST[$elId.'_'.$r_cnt]) && in_array($c_cnt,$_REQUEST[$elId.'_'.$r_cnt])===true){
+												$s_val.='&#10004;';
+											}else{
+												$s_val.='-';
+											}
+											break;
+									}
+									$s_val.='</td>';
+									$c_cnt++;
+								}
+								$r_cnt++;
+								$s_val.='</tr>';
+							}
+							$s_val.='</table>';
+							break;
+						case 'FormItBuilder_elementFile':
+							if(isset($_FILES[$elId])){
+								if($_FILES[$elId]['size']==0){
+									$s_val='None';
+								}
+							}
+							break;
+						case 'FormItBuilder_elementDate':
+							$s_val='[[+'.htmlspecialchars($o_el->getId()).'_0]] [[+'.htmlspecialchars($o_el->getId()).'_1]] [[+'.htmlspecialchars($o_el->getId()).'_2]]';
+							break;							
+						default:
+							$s_val='[[+'.htmlspecialchars($o_el->getId()).':nl2br]]';
+							break;
 					}
 					
 					$s_ret.='<tr valign="top" bgcolor="'.$bgCol.'"><td><b>'.htmlspecialchars($o_el->getLabel()).':</b></td><td>'.$s_val.'</td></tr>'.$NL;
@@ -1039,7 +1085,7 @@ class FormItBuilder extends FormItBuilderCore{
 	 * @return string 
 	 * @ignore 
 	 */
-	private function jqueryValidateJSON($jqFieldProps,$jqFieldMessages,$jqFormRules,$jqFormMessages){
+	private function jqueryValidateJSON($jqFieldProps,$jqFieldMessages,$jqGroups){
 		$a_ruleSegs = array();
 		$a_msgSegs = array();
 		foreach($jqFieldProps as $fieldID=>$a_fieldProp){
@@ -1056,6 +1102,15 @@ class FormItBuilder extends FormItBuilderCore{
 		'rules:{  '."\r\n  ".implode(",\r\n  ",$a_ruleSegs)."\r\n".'},'.
 		'messages:{  '."\r\n  ".implode(",\r\n  ",$a_msgSegs)."\r\n".'}'
 		;
+		if(empty($jqGroups)===false){
+			$s_js.=',groups:{'."\r\n";
+			$a_groupLines=array();
+			foreach($jqGroups as $key=>$val){
+				$a_groupLines[]=$key.':"'.$val.'"';
+			}
+			$s_js.=implode(",\r\n",$a_groupLines);
+			$s_js.='}'."\r\n";
+		}
 		
 		return $s_js;
 	}
@@ -1083,14 +1138,13 @@ class FormItBuilder extends FormItBuilderCore{
 		//process and add form rules
 		$a_fieldProps=array();
 		$a_fieldProps_jqValidate=array();
+		$a_fieldProps_jqValidateGroups=array();
 		$a_fieldProps_errstringFormIt=array();
 		$a_fieldProps_errstringJq=array();
 		
 		$a_formProps=array();
 		$a_formProps_custValidate=array();
-		$a_formProps_jqValidate=array();
 		$a_formPropsFormItErrorStrings=array();
-		$a_formPropsJqErrorStrings=array();
 
 		foreach($this->_rules as $rule){
 			$o_elFull = $rule->getElement();
@@ -1177,7 +1231,41 @@ class FormItBuilder extends FormItBuilderCore{
 					$a_fieldProps_errstringJq[$elName][] = 'digits:"'.$s_validationMessage.'"';
 					break;
 				case FormRuleType::required:
-					if(is_a($o_el, 'FormItBuilder_elementDate')){
+					if(is_a($o_el, 'FormItBuilder_elementMatrix')){
+						$s_type=$o_el->getType();
+						$a_formProps_custValidate[$elId][]=array('type'=>'elementMatrix_'.$s_type,'required'=>true,'errorMessage'=>$s_validationMessage);
+						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
+						$a_rows = $o_el->getRows();
+						$a_columns = $o_el->getColumns();
+						$a_namesForGroup=array();
+						switch($s_type){
+							case 'text':
+								for($row_cnt=0; $row_cnt<count($a_rows);$row_cnt++){
+									for($col_cnt=0; $col_cnt<count($a_columns); $col_cnt++){
+										$a_namesForGroup[]=$elName.'_'.$row_cnt.'_'.$col_cnt;
+										$a_fieldProps_jqValidate[$elName.'_'.$row_cnt.'_'.$col_cnt][] = 'required:true';
+										$a_fieldProps_errstringJq[$elName.'_'.$row_cnt.'_'.$col_cnt][] = 'required:"'.$s_validationMessage.'"';
+									}	
+								}
+								break;
+							case 'radio':
+								for($row_cnt=0; $row_cnt<count($a_rows);$row_cnt++){
+									$a_namesForGroup[]=$elName.'_'.$row_cnt;
+									$a_fieldProps_jqValidate[$elName.'_'.$row_cnt][] = 'required:true';
+									$a_fieldProps_errstringJq[$elName.'_'.$row_cnt][] = 'required:"'.$s_validationMessage.'"';
+								}
+								break;
+							case 'check':
+								for($row_cnt=0; $row_cnt<count($a_rows);$row_cnt++){
+									$s_fieldName = $elName.'_'.$row_cnt.'[]';
+									$a_namesForGroup[]=$s_fieldName;
+									$a_fieldProps_jqValidate[$s_fieldName][] = 'required:true';
+									$a_fieldProps_errstringJq[$s_fieldName][] = 'required:"'.$s_validationMessage.'"';
+								}
+								break;
+						}
+						$a_fieldProps_jqValidateGroups[$elName]=implode(' ',$a_namesForGroup);
+					}else if(is_a($o_el, 'FormItBuilder_elementDate')){
 						$a_formProps_custValidate[$elId][]=array('type'=>'elementDate','required'=>true,'errorMessage'=>$s_validationMessage);
 						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
 						$a_fieldProps_jqValidate[$elName.'_0'][] = 'required:true,dateElementRequired:true';
@@ -1185,8 +1273,6 @@ class FormItBuilder extends FormItBuilderCore{
 					}else{
 						$a_formProps_custValidate[$elId][]=array('type'=>'textfield','required'=>true,'errorMessage'=>$s_validationMessage);
 						$a_fieldProps[$elId][] = 'FormItBuilder_customValidation';
-						//$a_fieldProps[$elId][] = 'required';
-						//$a_fieldProps_errstringFormIt[$elId][] = 'vTextRequired=`'.$s_validationMessage.'`';
 						$a_fieldProps_jqValidate[$elName][] = 'required:true';
 						$a_fieldProps_errstringJq[$elName][] = 'required:"'.$s_validationMessage.'"';
 					}
@@ -1445,8 +1531,7 @@ thisFormEl.validate({errorPlacement:function(error, element) {
 $this->jqueryValidateJSON(
 	$a_fieldProps_jqValidate,
 	$a_fieldProps_errstringJq,
-	$a_formProps_jqValidate,
-	$a_formPropsJqErrorStrings
+	$a_fieldProps_jqValidateGroups
 ).'});
 	
 '.

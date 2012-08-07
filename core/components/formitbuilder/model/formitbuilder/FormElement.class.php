@@ -555,6 +555,84 @@ class FormItBuilder_elementButton extends FormItBuilder_element{
 	}
 }
 
+class FormItBuilder_elementMatrix extends FormItBuilder_element{
+	private $a_rows;
+	private $a_columns;
+	private $s_type;
+	
+	function __construct($id, $label, $type, $rowLabels, $columnLabels ){
+		parent::__construct($id,$label);
+		$this->a_columns = self::forceArray($columnLabels);
+		$this->a_rows  = self::forceArray($rowLabels);
+		if($type!='select'&&$type!='text'&&$type!='radio'&&$type!='check'){
+			FormItBuilder::throwError('[Element: '.$this->_id.'] Not a valid type, must be "select", "text", "radio" or "check".');
+		}else{
+			$this->s_type = $type;
+		}
+	}
+	
+	/**
+	 * getType()
+	 * 
+	 * Returns the matrix type ("select", "text", "radio" or "check")
+	 * @return string
+	 */
+	public function getType() { return $this->s_type; }
+	/**
+	 * getRows()
+	 * 
+	 * Returns the array of row labels
+	 * @return array 
+	 */
+	public function getRows() { return $this->a_rows; }
+	/**
+	 * getColumns()
+	 * 
+	 * Returns the array of column labels
+	 * @return array 
+	 */
+	public function getColumns() { return $this->a_columns; }
+	
+	/**
+	 * outputHTML()
+	 * 
+	 * Outputs the HTML for the element.
+	 * @return string 
+	 */
+	public function outputHTML(){
+		$s_ret.='<input type="hidden" name="'.htmlspecialchars($this->_id).'_gridInfo" value="'.count($this->a_rows).','.count($this->a_columns).'" />';
+		$s_ret.='<table class="matrix '.$this->s_type.'"><tr><th class="spaceCell">&nbsp;</th>';
+		foreach($this->a_columns as $column){
+			$s_ret.='<th class="columnHead">'.htmlspecialchars($column).'</th>';
+		}
+		$s_ret.='</tr>';
+		$r_cnt=0;
+		foreach($this->a_rows as $row){
+			$s_ret.='<tr><th class="rowHead">'.htmlspecialchars($row).'</th>';
+			$c_cnt=0;
+			foreach($this->a_columns as $column){
+				switch($this->s_type){
+					case 'text':
+						$el=new FormItBuilder_elementText($this->_id.'_'.$r_cnt.'_'.$c_cnt,'');
+						$s_cellHTML=$el->outputHTML();
+						break;
+					case 'radio':
+						$s_cellHTML='<input '.(isset($_POST[$this->_id.'_'.$r_cnt]) && ($_POST[$this->_id.'_'.$r_cnt]==$c_cnt)?'checked="checked" ':'').'type="radio" id="'.htmlspecialchars($this->_id.'_'.$r_cnt.'_'.$c_cnt).'" name="'.htmlspecialchars($this->_id.'_'.$r_cnt).'" value="'.htmlspecialchars($c_cnt).'" />';
+						break;
+					case 'check':
+						$s_cellHTML='<input '.(isset($_POST[$this->_id.'_'.$r_cnt]) && in_array($c_cnt,$_POST[$this->_id.'_'.$r_cnt])===true?'checked="checked" ':'').'type="checkbox" id="'.htmlspecialchars($this->_id.'_'.$r_cnt.'_'.$c_cnt).'" name="'.htmlspecialchars($this->_id.'_'.$r_cnt.'[]').'" value="'.$c_cnt.'" />';
+						break;
+				}
+				$c_cnt++;
+				$s_ret.='<td class="optionCell">'.$s_cellHTML.'</td>';
+			}			
+			$s_ret.='</tr>';
+			$r_cnt++;
+		}
+		$s_ret.='</table>';
+		return $s_ret;
+	}
+}
 /**
  * Creates three combined form elements to allow users to enter a date using three dropdown lists.
  * @package FormItBuilder
@@ -943,9 +1021,6 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 				
 		foreach($this->_values as $value){
 			$s_ret.='<div class="checkboxWrap">';
-			if($this->_showIndividualLabels===true){
-				$s_ret.='<label for="'.htmlspecialchars($this->_id.'_'.$i).'">'.htmlspecialchars($value['title']).'</label>';
-			}
 			// changed input type to checkbox
 			// added [] to name
 			$s_ret.='<div class="checkboxEl"><input type="checkbox" id="'.htmlspecialchars($this->_id.'_'.$i).'" name="'.htmlspecialchars($this->_name).'" value="'.htmlspecialchars($value['title']).'"';
@@ -959,7 +1034,11 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 					$selectedStr=' checked="checked"';
 				}
 			}
-			$s_ret.=$selectedStr.' /></div></div>'."\r\n";
+			$s_ret.=$selectedStr.' /></div>';
+			if($this->_showIndividualLabels===true){
+				$s_ret.='<label for="'.htmlspecialchars($this->_id.'_'.$i).'">'.htmlspecialchars($value['title']).'</label>';
+			}
+			$s_ret.='</div>'."\r\n";
 			$i++;
 		}
 		$s_ret.='</div>';
@@ -1144,12 +1223,12 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 		
 		//hidden field with same name is so we get a post value regardless of tick status
 		if(isset($_POST[$this->_id])===true){
-			$selectedStr=htmlspecialchars($_POST[$this->_id]);
+			$selectedStr=$_POST[$this->_id];
 		}else{
-			$selectedStr=htmlspecialchars($this->_defaultVal);
+			$selectedStr=$this->_defaultVal;
 		}
 		
-		$s_ret='<input type="'.$this->_fieldType.'" name="'.htmlspecialchars($this->_id).'" id="'.htmlspecialchars($this->_id).'"'.($this->_fieldType=='file'?'':' value="'.$selectedStr.'"');
+		$s_ret='<input type="'.$this->_fieldType.'" name="'.htmlspecialchars($this->_id).'" id="'.htmlspecialchars($this->_id).'"'.($this->_fieldType=='file'?'':' value="'.htmlspecialchars($selectedStr).'"');
 		if($this->_maxLength!==NULL){
 			$s_ret.=' maxlength="'.htmlspecialchars($this->_maxLength).'"';
 		}
