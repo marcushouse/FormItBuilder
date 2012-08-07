@@ -1,0 +1,129 @@
+/* Set some global basic rules such as font and font size etc */
+body, input, select, textarea {
+  font-family: Helvetica,Arial,sans-serif;
+  font-size: 12px; }
+
+/* FormItBuilder base rules */
+.form {
+  background-color: #e9edf3;
+  border-radius: 5px;
+  border: 1px solid #c8d3e3;
+  padding: 10px;
+  color: #233156;
+  overflow: auto;
+  margin: 10px; }
+  .form th, .form td {
+    padding: 3px;
+    border-bottom: 1px solid #c8d3e3;
+    border-right: 1px solid #c8d3e3; }
+  .form .matrix th {
+    background-color: #dfe5ee;
+    font-size: 90%; }
+  .form .matrix th.columnHead {
+    text-align: center;
+    border-top: 1px solid #c8d3e3; }
+  .form .matrix th.rowHead {
+    text-align: left;
+    border-left: 1px solid #c8d3e3; }
+  .form .matrix th.spaceCell {
+    background-color: transparent; }
+  .form .matrix .optionCell {
+    text-align: center; }
+    .form .matrix .optionCell input[type="text"] {
+      width: 8em; }
+  .form .formSegWrap {
+    padding: 0px 5px 5px 0px; }
+    .form .formSegWrap > label {
+      display: block;
+      font-weight: bold;
+      padding: 2px 0px 2px 0px; }
+    .form .formSegWrap .mainLabel:after {
+      content: ":"; }
+    .form .formSegWrap .elWrap {
+      padding: 2px 0px 2px 0px; }
+  .form .formSegWrap.elementCheckbox label.mainElLabel {
+    position: absolute;
+    margin-left: 30px; }
+  .form .formSegWrap.elementCheckbox .elWrap {
+    padding-right: 10px; }
+  .form .formSegWrap.elementCheckbox .mainLabel:after {
+    content: ""; }
+  .form .formSegWrap.elementCheckboxGroup .checkboxWrap {
+    clear: both; }
+    .form .formSegWrap.elementCheckboxGroup .checkboxWrap label {
+      display: inline-block;
+      margin: 3px 0px 0px 5px; }
+  .form .formSegWrap.elementCheckboxGroup .checkboxEl {
+    float: left; }
+    .form .formSegWrap.elementCheckboxGroup .checkboxEl input[type="checkbox"] {
+      margin-left: 0px; }
+  .form .formSegWrap.required .mainElLabel:after {
+    content: " *";
+    color: red; }
+  .form input[type="text"], .form textarea, .form input[type="password"] {
+    width: 210px; }
+  .form input[type="text"], .form textarea, .form select, .form input[type="password"] {
+    border: 1px solid #a9bbd6;
+    padding: 3px;
+    border-radius: 3px;
+    color: #233156; }
+  .form input[type="text"]:focus, .form textarea:focus, .form select:focus, .form input[type="password"]:focus {
+    background-color: #f4f7fb;
+    border-color: #4586e7; }
+  .form textarea {
+    font-size: 90%; }
+  .form textarea.error, .form input[type="text"].error, .form input[type="password"].error {
+    background-color: #ffe8e8;
+    border: 1px solid #c04242;
+    color: #c04242; }
+  .form input[type="radio"].error, .form input[type="checkbox"].error {
+    box-shadow: 0 0 3px red;
+    border: 1px solid red; }
+  .form input[type="submit"], .form input[type="button"], .form input[type="reset"] {
+    border: 1px solid #a9bbd6;
+    padding: 2px;
+    min-width: 110px;
+    border-radius: 3px;
+    background-color: #b0cde8;
+    cursor: pointer; }
+  .form input[type="submit"]:hover, .form input[type="button"]:hover, .form input[type="reset"]:hover {
+    background-color: #8ca2d9; }
+  .form .formSegWrap_submit, .form .formSegWrap_reset {
+    float: left;
+    width: auto;
+    margin: 10px 10px 10px 0px; }
+  .form label.mainLabelError {
+    font-weight: bold;
+    color: #990000; }
+  .form .errorContainer {
+    display: block;
+    /* for Non jQuery Validate form errors with multiple warnings */ }
+    .form .errorContainer label {
+      font-size: 11px;
+      display: block;
+      color: red;
+      clear: both; }
+      .form .errorContainer label span {
+        display: block; }
+  .form hr.formSpltter {
+    border-top: 1px dashed #c8d3e3;
+    border-bottom: none;
+    height: 1px;
+    margin: 5px 0px 5px 0px; }
+  .form h2 {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 2px 0px 5px 0px; }
+  .form .process_errors_wrap {
+    color: red; }
+  .form .radioWrap {
+    clear: both; }
+    .form .radioWrap label {
+      display: inline-block;
+      padding: 2px; }
+    .form .radioWrap .radioEl {
+      float: left;
+      clear: both; }
+  .form .tiny .elWrap span.after:after, .form .tiny .elWrap span.after:before {
+    content: "*";
+    padding-left: 2px; }

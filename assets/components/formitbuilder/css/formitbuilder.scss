@@ -1,0 +1,186 @@
+$borderCol:#c8d3e3;
+$errorCol:#FF0000;
+/* Set some global basic rules such as font and font size etc */
+body,input,select,textarea{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:12px;
+}
+
+/* FormItBuilder base rules */
+.form{
+	
+    background-color:#e9edf3;
+    border-radius:5px;
+    border:1px solid $borderCol;
+    padding:10px;
+    color:#233156; 
+	overflow:auto;
+	margin:10px;
+	
+	th,td{
+		padding:3px;
+		border-bottom: 1px solid $borderCol;
+		border-right: 1px solid $borderCol;
+	}
+	.matrix{
+		th{
+			background-color:#dfe5ee;
+			font-size:90%;
+		}
+
+		th.columnHead{
+			text-align:center;
+			border-top:1px solid $borderCol;
+		}
+		th.rowHead{
+			text-align:left;
+			border-left:1px solid $borderCol;
+		}
+
+		th.spaceCell{
+			background-color:transparent;
+		}
+		.optionCell{
+			text-align:center;
+			input[type="text"]{
+				width:8em;
+			}
+		}
+	}
+	.formSegWrap{
+		padding:0px 5px 5px 0px;
+		
+		> label{
+			display:block;
+			font-weight:bold;
+			padding:2px 0px 2px 0px;
+		}
+		.mainLabel:after{
+			content:":";
+		}
+		.elWrap{
+			padding:2px 0px 2px 0px;
+		}
+	}
+	.formSegWrap.elementCheckbox{
+		label.mainElLabel{
+			position:absolute;
+			margin-left:30px;
+		}
+		.elWrap{
+			padding-right:10px;
+		}
+		.mainLabel:after{
+			content:"";
+		}
+	}
+	.formSegWrap.elementCheckboxGroup{
+		.checkboxWrap{
+			clear:both;
+			label{
+				display: inline-block;
+				margin: 3px 0px 0px 5px;
+			}
+		}
+		.checkboxEl{
+			float:left;
+			input[type="checkbox"]{
+				margin-left:0px;
+			}
+		}
+	}
+	.formSegWrap.required .mainElLabel:after{
+		content:" *";
+		color:$errorCol;
+	}
+	
+	input[type="text"], textarea, input[type="password"]{
+		width:210px;
+	}
+	input[type="text"], textarea, select, input[type="password"]{
+		border:1px solid #a9bbd6;
+		padding:3px;
+		border-radius:3px;
+		color:#233156;
+	}
+	input[type="text"]:focus, textarea:focus, select:focus, input[type="password"]:focus{
+		background-color:#f4f7fb;
+		border-color:#4586e7;
+	}
+	textarea{font-size:90%;}
+	textarea.error, input[type="text"].error, input[type="password"].error{
+		background-color:#ffe8e8;
+		border:1px solid #c04242;
+		color:#c04242;
+	}
+	input[type="radio"].error,input[type="checkbox"].error{
+		box-shadow: 0 0 3px $errorCol;
+		border: 1px solid $errorCol;
+	}
+	input[type="submit"], input[type="button"], input[type="reset"]{
+		border:1px solid #a9bbd6;
+		padding:2px;
+		min-width:110px;
+		border-radius:3px;
+		background-color:#b0cde8;
+		cursor:pointer;
+	}
+	input[type="submit"]:hover, input[type="button"]:hover ,input[type="reset"]:hover{
+		background-color:#8ca2d9;
+	}
+	.formSegWrap_submit, .formSegWrap_reset{
+		float:left;
+		width:auto;
+		margin:10px 10px 10px 0px; 
+	}
+	label.mainLabelError{
+		font-weight:bold;
+		color:#990000;
+	}
+
+	.errorContainer{
+		display:block; /* for Non jQuery Validate form errors with multiple warnings */
+		label{
+			font-size:11px;
+			display:block;
+			color:$errorCol;
+			clear:both;
+			span{
+				display:block;
+			}
+		}
+	}
+
+	hr.formSpltter{
+		border-top:1px dashed $borderCol;
+		border-bottom:none;
+		height:1px;
+		margin:5px 0px 5px 0px;
+	}
+	h2{
+		font-size:18px;
+		font-weight:bold;
+		padding:2px 0px 5px 0px;
+	}
+
+	.process_errors_wrap{
+		color:$errorCol;
+	}
+	
+	.radioWrap{
+		clear:both;
+		label{
+			display:inline-block;
+			padding:2px;
+		}
+		.radioEl{
+			float:left;
+			clear:both;
+		}
+	}
+
+	.tiny .elWrap span.after:after, .tiny .elWrap span.after:before{
+		content:"*";
+		padding-left:2px;
+	}
+}
