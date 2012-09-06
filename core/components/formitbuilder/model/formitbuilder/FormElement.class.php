@@ -881,6 +881,7 @@ class FormItBuilder_elementCheckbox extends FormItBuilder_element{
 		if($this->_required===true){
 			$a_uncheckedVal=''; // we do this because FormIt will not validate it as empty if unchecked value has a value.
 		}
+		$selectedStr='';
 		if(isset($_POST[$this->_id])===true){
 			if($_POST[$this->_id]==$this->_value){
 				$selectedStr=' checked="checked"';

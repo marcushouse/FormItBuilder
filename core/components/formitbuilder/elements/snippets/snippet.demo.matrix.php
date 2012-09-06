@@ -5,7 +5,6 @@ require_once $modx->getOption('core_path',null,MODX_CORE_PATH).'components/formi
 /*--------------------*/
 /*CREATE FORM ELEMENTS*/
 /*--------------------*/
-//Text Fields
 $o_fe_checkMatrix          = new FormItBuilder_elementMatrix('checkMatrix','What foods do your children like?', 'check',
 	array('Child 1','Child 2','Child 3','Child 4'),
 	array('Fish','Beef','Chicken','Salad','Ice Cream')
@@ -39,16 +38,14 @@ foreach($a_formFields_required as $field){
 /*----------------------------*/
 $o_form = new FormItBuilder($modx,'TestForm');
 $o_form->setHooks(array('spam','email','redirect'));
-//$o_form->setRedirectDocument(4); //document to redirect to after successfull submission
+$o_form->setRedirectDocument(5);
 $o_form->addRules($a_formRules);
 $o_form->setPostHookName($snippetName);
 
 $o_form->setEmailToAddress('your@email.address');
 $o_form->setEmailToName('Your Name');
 $o_form->setEmailFromAddress('your@email.address');
-
 $o_form->setEmailSubject('MyCompany Contact Form Submission');
-$o_form->setEmailHeadHtml('<p>This is a response sent using the contact us form:</p>');
 
 
 $o_form->setJqueryValidation(true);

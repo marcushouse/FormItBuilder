@@ -1321,6 +1321,8 @@ class FormItBuilder extends FormItBuilderCore{
 					|| is_a($o_el,'FormItBuilder_elementDate')===true
 				){
 					$forId=$o_el->getId().'_0';
+				}else if(is_a($o_el,'FormItBuilder_elementMatrix')){
+					$forId=$o_el->getId().'_0_0';
 				}
 				$s_forStr = ' for="'.htmlspecialchars($forId).'"';
 				
