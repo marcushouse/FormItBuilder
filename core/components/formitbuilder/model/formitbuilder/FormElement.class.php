@@ -792,6 +792,10 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 	 * @ignore 
 	 */
 	private $_cols;
+	/**
+	 * @ignore 
+	 */
+	private $_placeholder;
 
 	/**
 	 * FormItBuilder_elementTextArea
@@ -802,12 +806,14 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 	 * @param int $rows The required rows (attribute value that must be set on a valid XHTML textarea tag)
 	 * @param int $cols The required cols (attribute value that must be set on a valid XHTML textarea tag)
 	 * @param string $defaultValue The default text to be written into the text area
+	 * @param string $placeholder The text to be written into the placeholder attribute
 	 */
-	function __construct($id, $label, $rows, $cols, $defaultValue=NULL) {
+	function __construct($id, $label, $rows, $cols, $defaultValue=NULL, $placeholder=NULL) {
 		parent::__construct($id,$label);
 		$this->_defaultVal = $defaultValue;
 		$this->_rows = FormItBuilderCore::forceNumber($rows);
 		$this->_cols = FormItBuilderCore::forceNumber($cols);
+		$this->_placeholder = $placeholder;
 	}
 	/**
 	 * outputHTML()
@@ -827,6 +833,9 @@ class FormItBuilder_elementTextArea extends FormItBuilder_element{
 		}
 		
 		$s_ret='<textarea id="'.htmlspecialchars($this->_id).'" rows="'.htmlspecialchars($this->_rows).'" cols="'.htmlspecialchars($this->_cols).'" name="'.htmlspecialchars($this->_id).'"';
+		if($this->_placeholder!==NULL){
+			$s_ret.=' placeholder="'.htmlspecialchars($this->_placeholder).'"';
+		}
 		//add classes last
 		if(count($a_classes)>0){
 			$s_ret.=' class="'.implode(' ',$a_classes).'"';
@@ -1080,6 +1089,10 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	 * @ignore
 	 */
 	protected $_defaultVal;
+	/**
+	 * @ignore
+	 */
+	protected $_placeholder;
 
 	/**
 	 * FormItBuilder_elementText
@@ -1088,8 +1101,9 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 	 * @param string $id The ID of the text field
 	 * @param string $label The label of the text field
 	 * @param string $defaultValue The default text to be written into the text field
+	 * @param string $placeholder The text to be written into the placeholder attribute
 	 */
-	function __construct( $id, $label, $defaultValue=NULL ) {
+	function __construct( $id, $label, $defaultValue=NULL, $placeholder=NULL ) {
 		parent::__construct($id,$label);
 		$this->_defaultVal = $defaultValue;
 		$this->_maxLength=NULL;
@@ -1097,6 +1111,7 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 		$this->_maxValue=NULL;
 		$this->_minValue=NULL;
 		$this->_fieldType='text';
+		$this->_placeholder=$placeholder;
 	}
 	/**
 	 * getMaxLength()
@@ -1236,6 +1251,10 @@ class FormItBuilder_elementText extends FormItBuilder_element{
 		if($this->_required===true){
 			$a_classes[]='required'; // for jquery validate (or for custom CSSing :) )
 		}
+		if($this->_placeholder!==NULL){
+			$s_ret.=' placeholder="'.htmlspecialchars($this->_placeholder).'"';
+		}
+		
 		//add classes last
 		if(count($a_classes)>0){
 			$s_ret.=' class="'.implode(' ',$a_classes).'"';
