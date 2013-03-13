@@ -1404,7 +1404,7 @@ class FormItBuilder extends FormItBuilderCore{
 		
 		
 		$s_formItCmd='[[!FormIt?'
-		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?','.implode(',',$this->_hooks):'').'`'
+		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?implode(',',$this->_hooks):'').'`'
 				
 		.(empty($s_recaptchaJS)===false?$nl.'&recaptchaJs=`'.$s_recaptchaJS.'`':'')
 		.(empty($this->_customValidators)===false?$nl.'&customValidators=`'.$this->_customValidators.'`':'')
