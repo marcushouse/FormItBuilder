@@ -1,4 +1,8 @@
 Changelog for FormItBuilder.
+FormItBuilder 1.3.4-pl
+====================================
+- Minor fix to hook command building for forms not using an email posthook (Thanks manu37).
+
 FormItBuilder 1.3.3-pl
 ====================================
 - Small bugfix in select form element compare code.

@@ -3,7 +3,7 @@ $errorCol:#FF0000;
 /* Set some global basic rules such as font and font size etc */
 body,input,select,textarea{
     font-family:Helvetica,Arial,sans-serif;
-    font-size:12px;
+    font-size:12px; 
 }
 
 /* FormItBuilder base rules */
@@ -16,6 +16,7 @@ body,input,select,textarea{
     color:#233156; 
 	overflow:auto;
 	margin:10px;
+	line-height:110%;
 	
 	th,td{
 		padding:3px;

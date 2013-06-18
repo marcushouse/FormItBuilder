@@ -1339,6 +1339,8 @@ class FormItBuilder extends FormItBuilderCore{
 					|| is_a($o_el,'FormItBuilder_elementDate')===true
 				){
 					$forId=$o_el->getId().'_0';
+				}else if(is_a($o_el,'FormItBuilder_elementMatrix')){
+					$forId=$o_el->getId().'_0_0';
 				}
 				$s_forStr = ' for="'.htmlspecialchars($forId).'"';
 				
@@ -1418,10 +1420,24 @@ class FormItBuilder extends FormItBuilderCore{
 			$this->_hooks[]='FormItBuilder_hooks';
 		}
 		
+		//rebuild hooks system
+		$s_hooksStr = '';
+		if(empty($this->_postHookName)===false){
+		    $s_hooksStr.=$this->_postHookName;
+		}
+		if(count($this->_hooks)>0){
+		    if(empty($this->_postHookName)===false){
+			$s_hooksStr.=',';
+		    }
+		    $s_hooksStr.=implode(',',$this->_hooks);
+		}
+		$s_fullHooksParam='';
+		if(empty($s_hooksStr)===false){
+		    $s_fullHooksParam=$nl.'&hooks=`'.$s_hooksStr.'`';
+		}
 		
 		$s_formItCmd='[[!FormIt?'
-		.$nl.'&hooks=`'.$this->_postHookName.(count($this->_hooks)>0?','.implode(',',$this->_hooks):'').'`'
-				
+		.$s_fullHooksParam				
 		.(empty($s_recaptchaJS)===false?$nl.'&recaptchaJs=`'.$s_recaptchaJS.'`':'')
 		.(empty($this->_customValidators)===false?$nl.'&customValidators=`'.$this->_customValidators.'`':'')
 			
