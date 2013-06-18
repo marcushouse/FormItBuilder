@@ -559,11 +559,13 @@ class FormItBuilder_elementMatrix extends FormItBuilder_element{
 	private $a_rows;
 	private $a_columns;
 	private $s_type;
+	private $a_defaultValues;
 	
-	function __construct($id, $label, $type, $rowLabels, $columnLabels ){
+	function __construct($id, $label, $type, $rowLabels, $columnLabels, $defaultValues=null ){
 		parent::__construct($id,$label);
 		$this->a_columns = self::forceArray($columnLabels);
 		$this->a_rows  = self::forceArray($rowLabels);
+		$this->a_defaultValues = $defaultValues;
 		if($type!='select'&&$type!='text'&&$type!='radio'&&$type!='check'){
 			FormItBuilder::throwError('[Element: '.$this->_id.'] Not a valid type, must be "select", "text", "radio" or "check".');
 		}else{
@@ -620,7 +622,17 @@ class FormItBuilder_elementMatrix extends FormItBuilder_element{
 						$s_cellHTML='<input '.(isset($_POST[$this->_id.'_'.$r_cnt]) && ($_POST[$this->_id.'_'.$r_cnt]==$c_cnt)?'checked="checked" ':'').'type="radio" id="'.htmlspecialchars($this->_id.'_'.$r_cnt.'_'.$c_cnt).'" name="'.htmlspecialchars($this->_id.'_'.$r_cnt).'" value="'.htmlspecialchars($c_cnt).'" />';
 						break;
 					case 'check':
-						$s_cellHTML='<input '.(isset($_POST[$this->_id.'_'.$r_cnt]) && in_array($c_cnt,$_POST[$this->_id.'_'.$r_cnt])===true?'checked="checked" ':'').'type="checkbox" id="'.htmlspecialchars($this->_id.'_'.$r_cnt.'_'.$c_cnt).'" name="'.htmlspecialchars($this->_id.'_'.$r_cnt.'[]').'" value="'.$c_cnt.'" />';
+						$s_cellHTML='<input ';
+						//set default values
+						if(isset($this->a_defaultValues[$r_cnt])===true){
+							for($i=0;$i<count($this->a_defaultValues[$r_cnt]);$i++){
+								if($this->a_defaultValues[$r_cnt][$i]==$c_cnt){
+									$s_cellHTML.='checked="checked" ';
+									break;
+								}
+							}
+						}
+						$s_cellHTML.=(isset($_POST[$this->_id.'_'.$r_cnt]) && in_array($c_cnt,$_POST[$this->_id.'_'.$r_cnt])===true?'checked="checked" ':'').'type="checkbox" id="'.htmlspecialchars($this->_id.'_'.$r_cnt.'_'.$c_cnt).'" name="'.htmlspecialchars($this->_id.'_'.$r_cnt.'[]').'" value="'.$c_cnt.'" />';
 						break;
 				}
 				$c_cnt++;

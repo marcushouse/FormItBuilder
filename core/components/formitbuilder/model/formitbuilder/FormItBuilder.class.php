@@ -198,6 +198,10 @@ class FormItBuilder extends FormItBuilderCore{
 	 * @ignore 
 	 */
 	private $_submitVar;
+	/**
+	 * @ignore 
+	 */
+	private $_formAction;
 
 	/**
 	 * FormItBuilder
@@ -208,7 +212,7 @@ class FormItBuilder extends FormItBuilderCore{
 	 */
 	function __construct(&$modx, $id) {
 	    $this->modx = &$modx;
-
+		$this->_formAction='[[~[[*id]]]]';
 		$this->_method = 'post'; 
 		$this->_id = $id;
 		$this->_store = true;
@@ -257,7 +261,13 @@ class FormItBuilder extends FormItBuilderCore{
 			$this->addRule($rule);
 		}
 	}
-	
+	/**
+	 * getFormAction()
+	 * 
+	 * Returns the form action (get, post etc)
+	 * @return string 
+	 */
+	public function getFormAction() { return $this->_formAction; }
 	/**
 	 * getMethod()
 	 * 
@@ -528,7 +538,14 @@ class FormItBuilder extends FormItBuilderCore{
 	 * Auto Responder - Returns the Auto Responder email content.
 	 * @return string
 	 */
-	public function getAutoResponderEmailContent() { return $this->_autoResponderEmailContent; }	
+	public function getAutoResponderEmailContent() { return $this->_autoResponderEmailContent; }
+	/**
+	 * setFormAction($value)
+	 * 
+	 * Sets the form action (defaults to link to the current resource)
+	 * @param string $value 
+	 */
+	public function setFormAction($value) { $this->_formAction = $value; }
 	/**
 	 * setMethod($value)
 	 * 
@@ -920,6 +937,7 @@ class FormItBuilder extends FormItBuilderCore{
 		$bgColDarkerBG='#cddaeb';
 		$colOutline='#8a99ae';
 		$rowCount=0;
+		$NL="\r\n";
 		$s_ret='<table cellpadding="5" cellspacing="0" style="'.$s_style.'">'.$NL;
 		foreach($this->_formElements as $o_el){
 			if(get_class($o_el)=='FormItBuilder_htmlBlock'){
@@ -1010,8 +1028,8 @@ class FormItBuilder extends FormItBuilderCore{
 		$NL="\r\n";
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
 		
-		$s_emailContent = $this->_autoResponderEmailContent;
-		$s_emailContent = str_replace('{{tableContent}}', $this->getFormTableContent(), $s_emailContent);
+		$s_emailContentRaw = $this->_autoResponderEmailContent;
+		$s_emailContent = str_replace('{{tableContent}}', $this->getFormTableContent(), $s_emailContentRaw);
 		
 		$s_ret='<div style="'.$s_style.'">'.$NL.$s_emailContent.$NL.'</div>';
 		return $s_ret;
@@ -1028,11 +1046,11 @@ class FormItBuilder extends FormItBuilderCore{
 		$NL="\r\n";
 		$s_style = 'font-size:'.$this->_emailFontSize.'; font-family:'.$this->_emailFontFamily.';';
 		
-		$s_footHTML = $this->_emailFootHtml;
+		$s_footHTML_raw = $this->_emailFootHtml;
 		$s_footHTML	= str_replace(
 			array('{{fromEmailAddress}}','{{subject}}'),
 			array(htmlspecialchars($this->_emailFromAddress),htmlspecialchars($this->_emailSubject)),
-			$s_footHTML
+			$s_footHTML_raw
 		);
 
 		$s_ret='<div style="'.$s_style.'">'.$NL.$this->_emailHeadHtml.$NL
@@ -1363,7 +1381,7 @@ class FormItBuilder extends FormItBuilderCore{
 		$s_form.=$nl.'</div>';
 
 		//wrap form elements in form tags
-		$s_form='<form action="[[~[[*id]]]]" method="'.htmlspecialchars($this->_method).'"'.($b_attachmentIncluded?' enctype="multipart/form-data"':'').' class="form" id="'.htmlspecialchars($this->_id).'">'.$nl
+		$s_form='<form action="'.$this->_formAction.'" method="'.htmlspecialchars($this->_method).'"'.($b_attachmentIncluded?' enctype="multipart/form-data"':'').' class="form" id="'.htmlspecialchars($this->_id).'">'.$nl
 		.$s_form.$nl
 		.'</form>';
 		
@@ -1526,6 +1544,7 @@ thisFormEl.validate({errorPlacement:function(error, element) {
 	//make nice little animation to scroll to the first invalid element instead of an instant jump
 	var jumpEl = $("#"+validator.errorList[0].element.id).parents(".formSegWrap");
 	$("html,body").animate({scrollTop: jumpEl.offset().top});
+    if(FormItBuilderInvalidCallback){FormItBuilderInvalidCallback();}
 },ignore:":hidden",'.
 					
 $this->jqueryValidateJSON(
