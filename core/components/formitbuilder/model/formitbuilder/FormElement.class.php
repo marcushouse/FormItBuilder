@@ -1048,8 +1048,10 @@ class FormItBuilder_elementCheckboxGroup extends FormItBuilder_element{
 			$s_ret.='<div class="checkboxEl"><input type="checkbox" id="'.htmlspecialchars($this->_id.'_'.$i).'" name="'.htmlspecialchars($this->_name).'" value="'.htmlspecialchars($value['title']).'"';
 			$selectedStr='';
 			if(isset($_POST[$this->_id])===true){
-				if(in_array($value['title'],$_POST[$this->_id])===true){
-					$selectedStr=' checked="checked"';
+				if(is_array($_POST[$this->_id])===true){
+					if(in_array($value['title'],$_POST[$this->_id])===true){
+						$selectedStr=' checked="checked"';
+					}
 				}
 			}else{
 				if(isset($value['checked'])===true && $value['checked']===true){
